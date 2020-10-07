@@ -1,7 +1,7 @@
 import React, {useState, useEffect} from 'react';
 import {
-    ResponsiveContainer, LineChart, Line, XAxis,
-    YAxis, CartesianGrid, Tooltip, AreaChart, Area
+    ResponsiveContainer, XAxis, YAxis, CartesianGrid,
+    Tooltip, AreaChart, Area
 } from 'recharts';
 
 function StockGraph({stock}) {
@@ -10,9 +10,11 @@ function StockGraph({stock}) {
     useEffect(() => {
         let testData = [];
         for(let i=0; i<13; i++) {
+            const randomChange = (Math.random() * (stock.price * 10) * 0.01)
+
             testData.push({
                 name: `Oct ${i+1}`,
-                price: (Math.floor(Math.random() * Math.floor(stock.price * 10))/100 + stock.price).toFixed(2)
+                price: (randomChange + stock.price).toFixed(2)
             })
         }
 
