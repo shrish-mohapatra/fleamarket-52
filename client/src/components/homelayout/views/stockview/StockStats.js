@@ -9,9 +9,10 @@ function StockStats({stock}) {
 
     return (
         <Descriptions className="stockview-stats" layout="vertical" bordered>
-            {stats.map(stat => (
+            {stats.map((stat, index) => (
                 <Item
                     label={stat.charAt(0).toUpperCase() + stat.slice(1)}
+                    key={`desc-item-${index}`}
                 >
                     {stock[stat] ? stock[stat] : 'N/A'}
                 </Item>

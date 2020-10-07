@@ -21,6 +21,7 @@ function Stockcard({props: {stock, index}}) {
             <p
                 className="stockcard-change"
                 style={{color: color}}
+                key={`stockchange-${index}`}
             >
                 {label}%
             </p>
@@ -28,7 +29,7 @@ function Stockcard({props: {stock, index}}) {
     }
 
     return (
-        <div className={getCardClass()} id={index} onClick={() => selectStock(index)}>
+        <div className={getCardClass()} onClick={() => selectStock(index)}>
             <p className="stockcard-ticker">{stock.ticker}</p>
             {renderChange(stock.change)}
             <p className="stockcard-price">${stock.price} x {stock.shares}</p>

@@ -16,7 +16,7 @@ function Stockbar() {
         >
             <div className="stockbar-menu">
                 {
-                    stocks.map((stock, index) => <Stockcard props={{stock, index}}/>)
+                    stocks.map((stock, index) => <Stockcard key={`stockcard-${index}`} props={{stock, index}}/>)
                 }
             </div>
         </Sider>

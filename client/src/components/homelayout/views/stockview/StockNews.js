@@ -49,7 +49,7 @@ function StockNews({stock}) {
     return (
         <div className="stockview-news">
             {news.reverse().map((news, index) => (
-                <div className="news-card" id={index}>
+                <div className="news-card" key={`stockview-${index}`}>
                     <p>{news.headline}</p>
 
                     <div className="news-meta">
