@@ -1,0 +1,32 @@
+{
+  "name": "fleamarket52",
+  "version": "0.0.1",
+  "description": "> A stock web portfolio application where users can view stocks, place buy/sell orders, and be notified of changes.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "nodemon index"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/shrish-mohapatra/fleamarket-52.git"
+  },
+  "author": "Shrish Mohapatra",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/shrish-mohapatra/fleamarket-52/issues"
+  },
+  "homepage": "https://github.com/shrish-mohapatra/fleamarket-52#readme",
+  "dependencies": {
+    "bcrypt": "^5.0.0",
+    "body-parser": "^1.19.0",
+    "cors": "^2.8.5",
+    "express": "^4.17.1",
+    "express-graphql": "^0.11.0",
+    "graphql": "^15.3.0",
+    "jsonwebtoken": "^8.5.1",
+    "moment": "^2.29.1",
+    "mongoose": "^5.10.9",
+    "nodemon": "^2.0.6"
+  }
+}

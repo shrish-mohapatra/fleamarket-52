@@ -5,11 +5,11 @@
 ## Running application
 1. After cloning the repo, run the following commands
 ```
-    cd ~/fleamarket52/client
+    cd ~/fleamarket52
     npm i
-    npm start
+    npm run dev
 ```
-2. Visit (http://localhost:3000) to view client.
+2. Visit (http://localhost:8000) to view application.
 
 
 ## Project Breakdown
