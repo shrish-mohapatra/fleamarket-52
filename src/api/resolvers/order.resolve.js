@@ -1,4 +1,9 @@
+const moment = require("moment");
+
 const Order = require("../models/order.model");
+const Account = require("../models/account.model");
+
+const { getStockPrice } = require("./stock.resolve");
 
 module.exports = {
 
@@ -8,16 +13,17 @@ module.exports = {
         @return  order MongoDB instance
     */
     createOrder: async(args) => {
-        let {accountID, stockID, action, quantity, price, expiry} = args;
+        let {accountID, stockID, action, quantity, price, expiry} = args;                      
 
         let order = await new Order({
             accountID,
             stockID,
             action,
             quantity,
-            price: "",
-            expiry: "",
+            price: price || "",
+            expiry: expiry || "",
             completed: "",
+            date: moment().format(),
         });
 
         return order.save();
@@ -33,5 +39,19 @@ module.exports = {
         let results = await Order.find(args);
         return results;
     },
+
+
+    /*
+        @desc    Cancel stock order
+        @param   args: {orderID}
+        @return  order MongoDB instance
+    */
+    cancelOrder: async(args) => {
+        let order = await Order.findById(args.orderID)
+        order.failed = true;
+        order.completed = moment().format();
+        
+        return order.save();
+    }
 
 }

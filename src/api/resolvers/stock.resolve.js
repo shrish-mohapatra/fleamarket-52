@@ -68,7 +68,7 @@ module.exports = {
     /*
         @desc    Retrieve latest stock price
         @param   args: {stockID}
-        @return  array stock price of most recent data
+        @return  price rounded to 2 decimal places
     */
     getStockPrice: async(args) => {
         let {stockID} = args;
@@ -80,6 +80,40 @@ module.exports = {
 
         let price = (parseFloat(stockData[0].ask) + parseFloat(stockData[0].bid))/2
         return price.toFixed(2);
+    },
+
+
+    /*
+        @desc    Retrieve latest stock ask price
+        @param   args: {stockID}
+        @return  price
+    */
+    getStockAsk: async(args) => {
+        let {stockID} = args;
+        let stockData = await StockData.find({stockID}).sort('-date').limit(1);
+
+        if(stockData.length == 0) {
+            return "N/A";
+        }
+
+        return stockData[0].ask;
+    },
+
+
+    /*
+        @desc    Retrieve latest stock bid price
+        @param   args: {stockID}
+        @return  price
+    */
+    getStockBid: async(args) => {
+        let {stockID} = args;
+        let stockData = await StockData.find({stockID}).sort('-date').limit(1);
+
+        if(stockData.length == 0) {
+            return "N/A";
+        }
+
+        return stockData[0].bid;
     },
     
 }

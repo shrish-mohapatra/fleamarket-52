@@ -6,8 +6,9 @@ const { graphqlHTTP } = require("express-graphql");
 
 // Custom
 const database = require("./config/database");
-const logging = require("./src/utilities/logging");
 const graphql_schema = require("./src/api/graphql/schema");
+const logging = require("./src/utilities/logging");
+const simulate = require("./src/utilities/simulate");
 
 // REST Routes
 const authRouter = require("./src/api/routes/auth.routes");
@@ -18,7 +19,8 @@ const app = express();
 const port = 8000;
 
 // Configure Middleware
-app.use(cors());
+app.use(cors())
+app.options('*', cors())
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(logging.logURL);
@@ -34,6 +36,7 @@ app.use('/api/rest/stock', stockRouter);
 app.use('/api/rest/order', orderRouter);
 
 database.connectAtlas();
+//simulate();
 
 app.listen(port, () => {
     console.log("\nServer is running on port " + port);

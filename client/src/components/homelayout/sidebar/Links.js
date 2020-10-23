@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useContext} from 'react';
 import { NavLink } from 'react-router-dom'
 import { Menu } from "antd"
 
@@ -8,7 +8,11 @@ import {
     LogoutOutlined
 } from '@ant-design/icons';
 
+import { AuthContext } from '../../../store/providers/AuthProvider';
+
 function Links() {
+    const { logout } = useContext(AuthContext);
+
     return (
         <Menu
             className="sidebar-menu"
@@ -27,7 +31,7 @@ function Links() {
 
             <Menu.Item key='logout' icon={<LogoutOutlined/>}>
                 Logout
-                <NavLink to='/auth'/>
+                <NavLink to='/auth' onClick={logout}/>
             </Menu.Item>
         </Menu>
     );

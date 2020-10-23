@@ -12,7 +12,7 @@ module.exports = {
         @param   args: {email, password}
         @return  token: JWT with userID serialized
     */
-    signin: async(args) => {
+    login: async(args) => {
         let {email, password} = args;
         let user = await User.findOne({email});
 
@@ -32,7 +32,8 @@ module.exports = {
 
         return {
             token: token.createToken(user.id),
-            message: `Succesfully signed in as ${user.email}.`
+            userID: user.id,
+            message: `Succesfully logged in as ${user.email}.`
         }
     },
 
@@ -62,6 +63,7 @@ module.exports = {
 
         return {
             token: token.createToken(user.id),
+            userID: user.id,
             message: `Succesfully registered as ${user.email}.`
         }
     },

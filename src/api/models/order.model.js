@@ -26,6 +26,11 @@ const orderSchema = mongoose.Schema({
         type: String,
         required: false,
     },
+    date: {
+        // Order creation date
+        type: String,
+        required: true
+    },
     expiry: {
         // Expiry date
         type: String,
@@ -36,6 +41,10 @@ const orderSchema = mongoose.Schema({
         type: String,
         required: false,
     },
+    failed: {
+        type: Boolean,
+        required: false
+    }
 })
 
 module.exports = mongoose.model('order', orderSchema);

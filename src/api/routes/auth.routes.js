@@ -4,7 +4,7 @@ const restWrapper = require("../resolvers/wrappers/restWrapper")
 
 const router = express.Router()
 
-router.post('/signup', (req, res) => restWrapper(req, res, resolve.signup))
+router.post('/login', (req, res) => restWrapper(req, res, resolve.login))
 router.post('/signin', (req, res) => restWrapper(req, res, resolve.signin))
 
 module.exports = router

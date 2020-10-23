@@ -1,18 +1,16 @@
 const graphql = require('graphql')
 
-// MongoDB Models
-const User = require('../models/user.model')
-const Account = require('../models/account.model')
-
 // GraphQL Types
 const types = require('./types')
 
 // Resolvers
-const authResolver = require('../resolvers/auth.resolve')
+const { signup } = require('../resolvers/auth.resolve')
+const { createOrder, cancelOrder } = require('../resolvers/order.resolve')
 
 const {
     GraphQLObjectType,
     GraphQLString,
+    GraphQLInt
 } = graphql;
 
 module.exports = new GraphQLObjectType({
@@ -20,13 +18,39 @@ module.exports = new GraphQLObjectType({
     fields: {
         // Auth Mutations
         signup: {
+            description: "Create new user, save to DB, and return auth token",
             type: types.AuthDataType,
             args: {
                 email: { type: GraphQLString },
                 password: { type: GraphQLString }
             },
             resolve(parent, args) {
-                return authResolver.signup(args)
+                return signup(args)
+            }
+        },
+
+        // Order Mutations
+        createOrder: {
+            description: "Create stock buy/sell order",
+            type: types.OrderType,
+            args: {
+                accountID: { type: GraphQLString },
+                stockID: { type: GraphQLString },
+                action: { type: GraphQLString },
+                quantity: { type: GraphQLInt },
+                price: { type: GraphQLString },
+                expiry: { type: GraphQLString },
+            },
+            resolve(parent, args) {
+                return createOrder(args)
+            }
+        },
+
+        cancelOrder: {
+            type: types.OrderType,
+            args: { orderID: { type: GraphQLString } },
+            resolve(parent, args) {
+                return cancelOrder(args)
             }
         },
     }

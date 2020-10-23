@@ -22,19 +22,21 @@ module.exports = new GraphQLObjectType({
     name: 'RootQueryType',
     fields: {
         // Auth Queries
-        signin: {
-            type: types.AuthDataType,
+        login: {
+            description: "Check if user exists in db and return auth token",
+            type: types.AuthDataType,            
             args: {
                 email: { type: GraphQLString },
                 password: { type: GraphQLString }
             },
             resolve(parent, args) {
-                return authResolver.signin(args)
+                return authResolver.login(args)
             }
         },
 
         // Stock Queries
         stocks: {
+            description: "Retrieve stocks based on query params",
             type: new GraphQLList(types.StockType),
             args: {
                 id: { type: GraphQLString },
@@ -49,7 +51,7 @@ module.exports = new GraphQLObjectType({
         // Test Queries
         user: {
             type: types.UserType,
-            args: { id: { type: GraphQLID } },
+            args: {id: { type: GraphQLID },},
             resolve(parent, args) {
                 return User.findById(args.id)
             }
