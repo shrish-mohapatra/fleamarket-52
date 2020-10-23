@@ -4,11 +4,12 @@ const graphql = require('graphql');
 const User = require("../models/user.model");
 const Account = require("../models/account.model");
 const Stock = require("../models/stock.model");
+const StockData = require("../models/stockData.model");
 const Order = require("../models/order.model");
 
 // Resolvers
 const stockResolver = require('../resolvers/stock.resolve')
-const { getPortfolio } = require('../resolvers/account.resolve')
+const accountResolver = require('../resolvers/account.resolve')
 
 const {
     GraphQLObjectType,
@@ -71,7 +72,7 @@ const AccountType = new GraphQLObjectType({
         portfolio: {
             type: new GraphQLList(StockType),
             resolve(parent, args) {
-                return getPortfolio({ accountID: parent.id })
+                return accountResolver.getPortfolio({ accountID: parent.id })
             }
         }
     })
@@ -87,10 +88,35 @@ const StockType = new GraphQLObjectType({
         market: { type: GraphQLString },    
         shares: { type: GraphQLString },
 
+        data: {
+            type: new GraphQLList(StockDataType),
+            resolve(parent, args) {
+                return stockResolver.getStockData({ stockID: parent.id })
+            }
+        },
+
         price: {
             type: GraphQLString,
             resolve(parent, args) {
                 return stockResolver.getStockPrice({
+                    stockID: parent._id
+                })
+            }
+        },
+
+        change: {
+            type: GraphQLString,
+            resolve(parent, args) {
+                return stockResolver.getStockChange({
+                    stockID: parent._id
+                })
+            }
+        },
+
+        open: {
+            type: GraphQLString,
+            resolve(parent, args) {
+                return stockResolver.getStockOpen({
                     stockID: parent._id
                 })
             }
@@ -113,6 +139,42 @@ const StockType = new GraphQLObjectType({
                 })
             }
         },
+
+        high: {
+            type: GraphQLString,
+            resolve(parent, args) {
+                return stockResolver.getStockHigh({
+                    stockID: parent._id
+                })
+            }
+        },
+
+        low: {
+            type: GraphQLString,
+            resolve(parent, args) {
+                return stockResolver.getStockLow({
+                    stockID: parent._id
+                })
+            }
+        },
+    })
+})
+
+
+const StockDataType = new GraphQLObjectType({
+    name: 'StockData',
+    fields: () => ({
+        id: { type: GraphQLID },
+        date: { type: GraphQLString },
+        ask: { type: GraphQLString },
+        bid: {type: GraphQLString},
+
+        stock: {
+            type: StockType,
+            resolve(parent, args) {
+                return Stock.findById(parent.stockID);
+            }
+        }
     })
 })
 
@@ -152,5 +214,6 @@ module.exports = {
 
     AccountType,
     StockType,
+    StockDataType,
     OrderType,
 }

@@ -1,6 +1,9 @@
-import React, { useState, createContext } from 'react';
+import React, { useState, createContext, useContext } from 'react';
+import { AuthContext } from './AuthProvider';
+import actions from '../actions/CoreActions'
 
 export const CoreContext = createContext({
+    user: null,
     stockRef: 0,
     stocks: [],
 
@@ -9,14 +12,17 @@ export const CoreContext = createContext({
 })
 
 export const CoreProvider = ({children}) => {
+    const { token, userID } = useContext(AuthContext);
+
     const [stockRef, setstockRef] = useState(0);
+    const [user, setUser] = useState(null);
     const [stocks, setStocks] = useState([
         {
             ticker: 'AAPL',
             name: 'Apple Inc.',
             change: -3.34,
             price: 113.16,
-            shares: 15,
+            shares: 15 ,
             open: 115.75,
             ask: 113.16,
             bid: 113.12,
@@ -68,8 +74,16 @@ export const CoreProvider = ({children}) => {
     return (
         <CoreContext.Provider
             value={{
+                user,
                 stockRef,
                 stocks,
+
+                getUser: async() => {                    
+                    let result = await actions.getUser({userID});
+                    if(result.message) return false                    
+                    
+                    setUser(result);
+                },
 
                 selectStock: (index) => {
                     setstockRef(index);
@@ -78,7 +92,7 @@ export const CoreProvider = ({children}) => {
                 getStocks: async() => {
                     // fetch stock data from REST API server
                     setStocks([]);
-                }
+                },
             }}
         >
             {children}

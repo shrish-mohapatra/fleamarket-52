@@ -10,12 +10,12 @@ module.exports = {
         @return  account MongoDB instance
     */
     createAccount: async(args) => {
-        let {userID, type} = args;
+        let {userID, type, balance} = args;
 
         let account = await new Account({
             type,
             userID,
-            balance: 0
+            balance: balance | 0,
         });
 
         return account.save();
@@ -78,39 +78,3 @@ module.exports = {
     }
 
 }
-
-/*
-1. iterate through non-completed orders
-2. if buy
-    a) check if account has enough funds
-    b) process order
-3. if sell
-    a) check if account has enough shares
-    b) process order
-
-
-canBuy should fail and complete order if doesnt work
-canSell should fail and complete order if it doesnt work
-
-for(order in orders)
-    //buy logic
-    if(price)
-        if(!canBuy(price)) continue
-        if(stock.price > price) continue
-    else
-        if(!canBuy(stock.price)) continue
-
-    deduct amount from balance
-
-    //sell logic
-    if(!canSell) continue
-
-    if(price)
-        if(stock.price < price) continue
-
-    add amount from balance
-
-    // both logic
-    complete order()
-
-*/
