@@ -10,6 +10,7 @@ const database = require("./config/database");
 const graphql_schema = require("./src/api/graphql/schema");
 const logging = require("./src/utilities/logging");
 const simulate = require("./src/utilities/simulate");
+const { validate } = require("./src/utilities/token");
 
 // REST Routes
 const authRouter = require("./src/api/routes/auth.routes");
@@ -25,6 +26,7 @@ app.options('*', cors())
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(logging.logURL);
+app.use(validate)
 
 // Serve react app
 app.use(express.static(path.join(__dirname, "client", "build")));
@@ -41,7 +43,7 @@ app.use('/api/rest/stock', stockRouter);
 app.use('/api/rest/order', orderRouter);
 
 database.connectAtlas();
-//simulate();
+simulate();
 
 app.listen(port, () => {
     console.log("\nServer is running on port " + port);

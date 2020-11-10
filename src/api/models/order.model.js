@@ -23,7 +23,9 @@ const orderSchema = mongoose.Schema({
         required: true
     },
     price: {
-        type: String,
+        // scale factor of 100
+        // ex. price = 12345 => $123.45
+        type: Number,
         required: false,
     },
     date: {

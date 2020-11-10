@@ -20,7 +20,7 @@ module.exports = {
             stockID,
             action,
             quantity,
-            price: price || "",
+            price: price || null,
             expiry: expiry || "",
             completed: "",
             date: moment().format(),

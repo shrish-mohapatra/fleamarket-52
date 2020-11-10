@@ -3,6 +3,9 @@ const moment = require("moment");
 const Stock = require("../models/stock.model");
 const StockData = require("../models/stockData.model");
 
+// Note that all numerical data has scale factor of 100
+// ex. price = 12345 => $123.45
+
 module.exports = {
 
     /*
@@ -70,7 +73,7 @@ module.exports = {
     */
     getStockPrice: async(args) => {
         let stockData = await fetchData(args);
-        if(!stockData) return "N/A";
+        if(!stockData) return null;
 
         return calculatePrice(stockData[0]);
     },
@@ -83,7 +86,7 @@ module.exports = {
     */
     getStockAsk: async(args) => {
         let stockData = await fetchData(args);
-        if(!stockData) return "N/A";
+        if(!stockData) return null;
 
         return stockData[0].ask;
     },
@@ -96,7 +99,7 @@ module.exports = {
     */
     getStockBid: async(args) => {
         let stockData = await fetchData(args);
-        if(!stockData) return "N/A";
+        if(!stockData) return null;
 
         return stockData[0].bid;
     },
@@ -108,10 +111,10 @@ module.exports = {
         @return  price
     */
     getStockHigh: async(args) => {
-        let stockData = await fetchData({...args, filter: '-ask'});
-        if(!stockData) return "N/A";
+        let stockData = await fetchData({...args, filter: 'ask'});
+        if(!stockData) return null;
 
-        return calculatePrice(stockData[0]);
+        return stockData[0].ask;
     },
 
     /*
@@ -120,36 +123,34 @@ module.exports = {
         @return  price
     */
     getStockLow: async(args) => {
-        let stockData = await fetchData({...args, filter: 'bid'});
-        if(!stockData) return "N/A";
+        let stockData = await fetchData({...args, filter: '-bid'});
+        if(!stockData) return null;
 
-        return calculatePrice(stockData[0]);
+        return stockData[0].bid;
     },
 
     /*
         @desc    Retrieve stock price change
         @param   args: {stockID}
-        @return  price change (percentage %)
+        @return  price change (percentage %, scale factor of 100)
     */
     getStockChange: async(args) => {
         let stockData = await fetchData(args);
-        if(!stockData) return "N/A";
+        if(!stockData) return null;
 
         const curPrice = calculatePrice(stockData[0]);
         const prevClose = await getPrevClose(args);
 
-        if(!prevClose) return "N/A";
+        if(!prevClose) return null;
 
-        let change = ((parseFloat(curPrice) - parseFloat(prevClose))/parseFloat(prevClose)) * 100;
-
-        return change.toFixed(2);
+        return Math.floor(((curPrice - prevClose)/prevClose) * 10000);
     }, 
 
     /*
     */
    getStockOpen: async(args) => {
        let prevClose = await getPrevClose(args);
-       if(!prevClose) return "N/A";
+       if(!prevClose) return null;
        return prevClose;
    }
 }
@@ -177,8 +178,7 @@ const fetchData = async (args) => {
     @return  price
 */
 const calculatePrice = (stockData) => {
-    let price = (parseFloat(stockData.ask) + parseFloat(stockData.bid))/2;
-    return price.toFixed(2);   
+    return Math.floor((stockData.ask + stockData.bid)/2);
 }
 
 /*

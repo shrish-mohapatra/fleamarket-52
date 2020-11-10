@@ -52,7 +52,7 @@ const AccountType = new GraphQLObjectType({
     name: 'Account',
     fields: () => ({
         id: { type: GraphQLID },
-        balance: { type: GraphQLString },
+        balance: { type: GraphQLInt },
         type: { type: GraphQLString },
 
         user: {
@@ -86,7 +86,7 @@ const StockType = new GraphQLObjectType({
         name: { type: GraphQLString },
         ticker: { type: GraphQLString },
         market: { type: GraphQLString },    
-        shares: { type: GraphQLString },
+        shares: { type: GraphQLInt },
 
         data: {
             type: new GraphQLList(StockDataType),
@@ -96,7 +96,7 @@ const StockType = new GraphQLObjectType({
         },
 
         price: {
-            type: GraphQLString,
+            type: GraphQLInt,
             resolve(parent, args) {
                 return stockResolver.getStockPrice({
                     stockID: parent._id
@@ -105,7 +105,7 @@ const StockType = new GraphQLObjectType({
         },
 
         change: {
-            type: GraphQLString,
+            type: GraphQLInt,
             resolve(parent, args) {
                 return stockResolver.getStockChange({
                     stockID: parent._id
@@ -114,7 +114,7 @@ const StockType = new GraphQLObjectType({
         },
 
         open: {
-            type: GraphQLString,
+            type: GraphQLInt,
             resolve(parent, args) {
                 return stockResolver.getStockOpen({
                     stockID: parent._id
@@ -123,7 +123,7 @@ const StockType = new GraphQLObjectType({
         },
 
         ask: {
-            type: GraphQLString,
+            type: GraphQLInt,
             resolve(parent, args) {
                 return stockResolver.getStockAsk({
                     stockID: parent._id
@@ -132,7 +132,7 @@ const StockType = new GraphQLObjectType({
         },
 
         bid: {
-            type: GraphQLString,
+            type: GraphQLInt,
             resolve(parent, args) {
                 return stockResolver.getStockBid({
                     stockID: parent._id
@@ -141,7 +141,7 @@ const StockType = new GraphQLObjectType({
         },
 
         high: {
-            type: GraphQLString,
+            type: GraphQLInt,
             resolve(parent, args) {
                 return stockResolver.getStockHigh({
                     stockID: parent._id
@@ -150,7 +150,7 @@ const StockType = new GraphQLObjectType({
         },
 
         low: {
-            type: GraphQLString,
+            type: GraphQLInt,
             resolve(parent, args) {
                 return stockResolver.getStockLow({
                     stockID: parent._id
@@ -166,8 +166,8 @@ const StockDataType = new GraphQLObjectType({
     fields: () => ({
         id: { type: GraphQLID },
         date: { type: GraphQLString },
-        ask: { type: GraphQLString },
-        bid: {type: GraphQLString},
+        ask: { type: GraphQLInt },
+        bid: {type: GraphQLInt},
 
         stock: {
             type: StockType,
@@ -185,7 +185,7 @@ const OrderType = new GraphQLObjectType({
         id: { type: GraphQLID },
         action: { type: GraphQLString },
         quantity: { type: GraphQLInt },
-        price: { type: GraphQLString },
+        price: { type: GraphQLInt },
         date: { type: GraphQLString },
         expiry: { type: GraphQLString },
         completed: { type: GraphQLString },

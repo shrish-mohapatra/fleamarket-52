@@ -1,6 +1,5 @@
 /*
     @TODO
-        - fix account balance issues after order processing
         - socket notification to client informing of order status
         - incorporate expiry date
 */
@@ -33,7 +32,7 @@ const simulateOrders = async () => {
 
     for(let i=0; i<orders.length; i++) {
         console.log("Processing order #" + i)
-        processAction(orders[i]);
+        await processAction(orders[i]);
     }
 }
 
@@ -70,23 +69,19 @@ const processBuy = async (order, account, marketPrice) => {
     let total, price;
 
     // Get market price or use limit price
-    if(order.price === "") {
-        price = parseFloat(marketPrice);
-    } else {
-        price = parseFloat(order.price);
-    }
+    price = order.price ? order.price : marketPrice
 
-    total = price * parseFloat(order.quantity);
+    total = price * order.quantity;
 
     // Check if account has enough funds for order
-    if(total > parseFloat(account.balance)) {
+    if(total > account.balance) {
         failOrder(order, marketPrice);
         return false;
     }
 
     if(marketPrice > price) return false
 
-    account.balance = parseFloat(account.balance) - parseFloat(total);
+    account.balance = account.balance - total;
     account.save();
 
     return true
@@ -102,23 +97,19 @@ const processSell = async (order, account, marketPrice) => {
     let stocks = await getPortfolio({accountID: order.accountID, returnMap: true})
 
     // Check if there are enough shares to sell
-    if(stocks[order.stockID].shares < order.quantity) {
+    if(!stocks[order.stockID] || stocks[order.stockID].shares < order.quantity) {
         failOrder(order, marketPrice);
         return false;
     }
 
     // Get market price or use limit price
-    if(order.price === "") {
-        price = parseFloat(marketPrice);
-    } else {
-        price = parseFloat(order.price);
-    }
+    price = order.price ? order.price : marketPrice
 
     if(marketPrice < price) return false
 
-    total = price * parseFloat(order.quantity);
+    total = price * order.quantity;
 
-    account.balance = parseFloat(account.balance) + parseFloat(total);
+    account.balance = account.balance + total;
     account.save();
 
     return true

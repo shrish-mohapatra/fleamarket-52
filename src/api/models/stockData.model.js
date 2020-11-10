@@ -10,11 +10,15 @@ const stockDataSchema = mongoose.Schema({
         required: true
     },
     ask: {
-        type: String,
+        // scale factor of 100
+        // ex. ask = 12345 => $123.45
+        type: Number,
         required: true
     },
     bid: {
-        type: String,
+        // scale factor of 100
+        // ex. bid = 12345 => $123.45
+        type: Number,
         required: true
     }, 
     date: {

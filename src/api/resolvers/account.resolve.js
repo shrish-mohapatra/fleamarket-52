@@ -6,7 +6,7 @@ module.exports = {
 
     /*
         @desc    Create portfolio account with zero balance
-        @param   args: {userID, type}
+        @param   args: {userID, type, balance*} *optional
         @return  account MongoDB instance
     */
     createAccount: async(args) => {

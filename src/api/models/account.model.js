@@ -10,7 +10,9 @@ const accountSchema = mongoose.Schema({
         required: true
     },
     balance: {
-        type: String,
+        // scale factor of 100
+        // ex. balance = 12345 => $123.45
+        type: Number,
         required: true
     },
     type: {
