@@ -9,7 +9,7 @@ const { graphqlHTTP } = require("express-graphql");
 const database = require("./config/database");
 const graphql_schema = require("./src/api/graphql/schema");
 const logging = require("./src/utilities/logging");
-const simulate = require("./src/utilities/simulate");
+const { simulateCore } = require("./src/utilities/simulate");
 const { validate } = require("./src/utilities/token");
 
 // REST Routes
@@ -42,8 +42,8 @@ app.use('/api/rest/auth', authRouter);
 app.use('/api/rest/stock', stockRouter);
 app.use('/api/rest/order', orderRouter);
 
-database.connectAtlas();
-simulate();
+database.connectLocal();
+simulateCore();
 
 app.listen(port, () => {
     console.log("\nServer is running on port " + port);

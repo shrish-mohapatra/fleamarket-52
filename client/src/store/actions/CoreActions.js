@@ -4,8 +4,6 @@ export default {
     getUser: async(args) => {        
         let {userID} = args;
 
-        userID = "5f90d652b211944c9ca8b278"
-
         try {
             const result = await axios.post("/api/graph", { query: 
                 `

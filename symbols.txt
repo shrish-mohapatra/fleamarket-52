@@ -1,30 +1,30 @@
-AXP
-AMGN
-AAPL
-BA
-CAT
-CSCO
-CVX
-GS
-HD
-HON
-IBM
-INTC
-JNJ
-KO
-JPM
-MCD
-MMM
-MRK
-MSFT
-NKE
-PG
-TRV
-UNH
-CRM
-VZ
-V
-WBA
-WMT
-DIS
-DOW
+AXP:American Express Company:11700
+AMGN:Amgen Inc.:24126
+AAPL:Apple Inc.:11607
+BA:Boeing Company:19133
+CAT:Caterpillar, Inc.:17300
+CSCO:Cisco Systems, Inc.:3875
+CVX:Chevron Corporation:8349
+GS:Goldman Sachs Group, Inc.:21799
+HD:Home Depot, Inc.:27595
+HON:Honeywell International Inc.:20498
+IBM:International Business Machines:11785
+INTC:Intel Corporation:4552
+JNJ:Johnson & Johnson:14866
+KO:Coca-Cola Company:5396
+JPM:JP Morgan Chase & Co.:11700
+MCD:McDonald's Corporation:21350
+MMM:3M Company:16876
+MRK:Merck & Company, Inc.:8139
+MSFT:Microsoft Corporation:21110
+NKE:Nike, Inc.:12850
+PG:Procter & Gamble Company:14025
+TRV:The Travelers Companies, Inc.:13602
+UNH:UnitedHealth Group Incorporated:35989
+CRM:Salesforce.com Inc:24826
+VZ:Verizon Communications Inc.:6120
+V:Visa Inc.:21389
+WBA:Walgreens Boots Alliance, Inc.:4261
+WMT:Walmart Inc.:14600
+DIS:Walt Disney Company:14175
+DOW:Dow Inc.:5363

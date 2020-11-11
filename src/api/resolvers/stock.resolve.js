@@ -111,7 +111,7 @@ module.exports = {
         @return  price
     */
     getStockHigh: async(args) => {
-        let stockData = await fetchData({...args, filter: 'ask'});
+        let stockData = await fetchData({...args, filter: '-ask'});
         if(!stockData) return null;
 
         return stockData[0].ask;
@@ -123,7 +123,7 @@ module.exports = {
         @return  price
     */
     getStockLow: async(args) => {
-        let stockData = await fetchData({...args, filter: '-bid'});
+        let stockData = await fetchData({...args, filter: 'bid'});
         if(!stockData) return null;
 
         return stockData[0].bid;

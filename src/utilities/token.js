@@ -2,7 +2,7 @@ const keys = require("../../config/keys");
 const jwt = require("jsonwebtoken");
 
 // Toggle whether requests from server require token
-const BYPASS_ORIGIN_AUTH = true
+const BYPASS_ORIGIN_AUTH = false
 const BYPASS_ROUTES = ['login', 'signup']
 
 /*

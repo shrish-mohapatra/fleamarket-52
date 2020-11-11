@@ -9,19 +9,45 @@ const moment = require("moment");
 const Order = require("../api/models/order.model");
 const Account = require("../api/models/account.model");
 
-const { getStockPrice } = require("../api/resolvers/stock.resolve");
+const { createStockData, getStockPrice } = require("../api/resolvers/stock.resolve");
 const { getPortfolio } = require("../api/resolvers/account.resolve");
 
 const REFRESH = 10; // in seconds
 
+// Stock Data simulation parameters
+const SPREAD_FACTOR = 0.0086
+const RANDOM_FACTOR = 0.1
 
 /*
     @desc    Core simulation process for stock market simulation
     @notes   Uses 'setInterval()' to repeat process every X seconds
 */
-module.exports = () => {
+const simulateCore = async () => {
     setInterval(simulateOrders, REFRESH * 1000);
-};
+}
+
+
+/*
+    @desc    Create certain amount of time worth of stockData
+    @params  (stockID, timeAmount, timeUnit, startPrice, startDate*) *optional
+    @usage   ex. simulateStockData(<STOCKID>, 7, "days", 12345)
+*/
+const simulateStockData = async (stockID, timeAmount, timeUnit, startPrice, startDate = moment()) => {
+    let ask = parseInt(startPrice);
+    let date = startDate;
+
+    for(let i=0; i<timeAmount; i++) {
+        await createStockData({
+            stockID,
+            ask,
+            bid: Math.floor(ask * (1 - SPREAD_FACTOR)),
+            date: date.format()
+        })
+
+        ask = generateNextAsk(ask);
+        date = date.add(1, timeUnit);
+    }
+}
 
 
 /*
@@ -35,6 +61,7 @@ const simulateOrders = async () => {
         await processAction(orders[i]);
     }
 }
+
 
 /*
     @desc    Process a specific buy/sell order
@@ -59,6 +86,7 @@ const processAction = async (order) => {
     order.price = marketPrice;
     order.save();
 }
+
 
 /*
     @desc    Process a buy order
@@ -86,6 +114,7 @@ const processBuy = async (order, account, marketPrice) => {
 
     return true
 }
+
 
 /*
     @desc    Process a sell order
@@ -115,6 +144,7 @@ const processSell = async (order, account, marketPrice) => {
     return true
 }
 
+
 /*
     @desc    Fail and complete a order
     @params  order, marketPrice
@@ -125,3 +155,22 @@ const failOrder = (order, marketPrice) => {
     order.price = marketPrice;
     order.save();
 }
+
+
+/*
+    @desc    Randomly generate next stock ask price
+    @params  (ask)
+    @return  int: new ask price
+*/
+const generateNextAsk = (ask) => {
+    const changeValue = Math.floor(Math.random() * ask * RANDOM_FACTOR)
+    const changeDir = Math.round(Math.random()) ? -1 : 1;
+
+    return ask + (changeValue * changeDir);
+}
+
+
+module.exports = {
+    simulateCore,
+    simulateStockData
+};
