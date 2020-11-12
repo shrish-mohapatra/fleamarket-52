@@ -14,7 +14,7 @@ function StockStats({stock}) {
                     label={stat.charAt(0).toUpperCase() + stat.slice(1)}
                     key={`desc-item-${index}`}
                 >
-                    {stock[stat] ? stock[stat] : 'N/A'}
+                    {stock[stat] ? stock[stat]/100 : 'N/A'}
                 </Item>
             ))}
         </Descriptions>

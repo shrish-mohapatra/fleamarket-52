@@ -15,7 +15,7 @@ function Stockcard({props: {stock, index}}) {
     const renderChange = (change) => {
         const color = (change > 0) ? 'green' : 'red';
         const prefix = (change > 0) ? '+' : '-';
-        const label = prefix + Math.abs(change);
+        const label = prefix + Math.abs(change/100);
 
         return (
             <p
@@ -32,7 +32,7 @@ function Stockcard({props: {stock, index}}) {
         <div className={getCardClass()} onClick={() => selectStock(index)}>
             <p className="stockcard-ticker">{stock.ticker}</p>
             {renderChange(stock.change)}
-            <p className="stockcard-price">${stock.price} x {stock.shares}</p>
+            <p className="stockcard-price">${stock.price/100}</p>
         </div>
     );
 }

@@ -51,7 +51,7 @@ module.exports = {
         @return  array of stock MongoDB instances
     */
     getStocks: async(args) => {
-        let result = await Stock.find(args);
+        let result = await Stock.find(args)
         return result;
     },
 

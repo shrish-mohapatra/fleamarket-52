@@ -69,7 +69,7 @@ const populateStocks = async (symbols) => {
             WEEKS_TO_SIM * 7,
             "days",
             data[2],
-            moment().subtract(WEEKS_TO_SIM * 7)
+            moment().subtract(WEEKS_TO_SIM * 7, 'days')
         );
     }
 }

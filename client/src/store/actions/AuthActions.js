@@ -1,55 +1,23 @@
-import axios from 'axios';
+import { gql } from '@apollo/client';
 
 export default {
-    login: async(args) => {
-        const {email, password} = args;
-
-        try {
-            const result = await axios.post("/api/graph", { query: 
-                `
-                {
-                    login(email: "${email}",password: "${password}") {
-                        token
-                        message
-                    }
-                }
-                `
-            })
-
-            if(result.data.errors) return {message: result.data.errors[0].message}
-
-            return {
-                token: result.data.data.login.token,
-                userID: result.data.data.login.userID,
+    login: gql`
+        mutation Login($email: String!, $password: String!) {
+            login(email: $email, password: $password) {
+                message            
+                userID
+                token
             }
-        } catch (error) {
-            return {message: error.response}
-        }
-    },
+        }`
+    ,
 
-    signup: async(args) => {
-        const {email, password} = args;
-
-        try {
-            const result = await axios.post("/api/graph", { query: 
-                `
-                mutation{
-                    signup(email: "${email}",password: "${password}") {
-                        token
-                        message
-                    }
-                }
-                `
-            })
-
-            if(result.data.errors) return {message: result.data.errors[0].message}
-
-            return {
-                token: result.data.data.login.token,
-                userID: result.data.data.login.userID,
+    signup: gql`
+        mutation Signup($email: String!, $password: String!) {
+            signup(email: $email, password: $password) {
+                message            
+                userID
+                token
             }
-        } catch (error) {
-            return {message: error.response}
-        }
-    },
+        }`
+    ,
 }

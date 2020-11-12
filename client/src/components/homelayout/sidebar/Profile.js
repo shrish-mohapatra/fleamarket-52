@@ -4,26 +4,23 @@ import { UserOutlined } from '@ant-design/icons';
 import { CoreContext } from '../../../store/providers/CoreProvider';
 
 function Profile() {
-    const { user, getUser } = useContext(CoreContext);
-
-    useEffect(() => {
-        if(!user) {
-            getUser();
-        }
-    }, [])
+    const { user } = useContext(CoreContext);
 
     const renderInfo = () => {
-        if(user) return (
-            <div className="profile-info">
-                <p className="info-name">{user.email}</p>
-                <p className="info-balance">${user.accounts[0].balance}</p>
-            </div>
-        )
+        if(user.data) {
+            let data = user.data.user
+            return (
+                <div className="profile-info">
+                    <p className="info-name">{data.email}</p>
+                    <p className="info-balance">${(data.accounts[0].balance/100).toFixed(2)}</p>
+                </div>
+            )
+        }
     }
 
     return (        
         <div className="profile">
-            <Skeleton loading={!user} active>
+            <Skeleton loading={user.loading} active avatar>
                 <Avatar
                     className="profile-avatar"
                     size={48}

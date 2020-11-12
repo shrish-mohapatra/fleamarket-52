@@ -7,7 +7,7 @@ import { AuthContext } from '../../store/providers/AuthProvider';
 
 
 function AuthForm({ formType }) {
-    const { login, signup, userID } = useContext(AuthContext);
+    const { login, signup, token } = useContext(AuthContext);
     const formRef = useRef();
 
     const onFinish = async () => {
@@ -75,7 +75,7 @@ function AuthForm({ formType }) {
         </Form>
     )
 
-    if(userID != "") {
+    if(token != "") {
         return <Redirect to='/home'/>
     }
 

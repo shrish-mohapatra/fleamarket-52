@@ -2,7 +2,7 @@ const keys = require("../../config/keys");
 const jwt = require("jsonwebtoken");
 
 // Toggle whether requests from server require token
-const BYPASS_ORIGIN_AUTH = false
+const BYPASS_ORIGIN_AUTH = true
 const BYPASS_ROUTES = ['login', 'signup']
 
 /*
@@ -23,12 +23,14 @@ const createToken = (userID) => (
     @param   (req, res, next)
 */
 const validate = (req, res, next) => {
-    try {
+    try {        
         if(!requires_auth(req)) return next();
     
         // Check for token
         const token = req.headers.token;
-        if(!token) return res.status(400).json({message: "Missing token"});
+        if(!token) return res.status(400).json({
+            message: "Missing token."
+        })
 
         // Refresh token
         const decoded = jwt.verify(token, keys.key);
@@ -46,8 +48,8 @@ const validate = (req, res, next) => {
     @param   (req)
     @return  boolean: true (requires auth), false (no auth required)
 */
-const requires_auth = (req) => {  
-    if(BYPASS_ORIGIN_AUTH) return false;
+const requires_auth = (req) => {
+    if(BYPASS_ORIGIN_AUTH && req.get('origin') !== "http://localhost:3000") return false;
 
     // GraphQL query check
     if(req.body.query) {

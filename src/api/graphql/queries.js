@@ -3,12 +3,12 @@ const graphql = require('graphql')
 // MongoDB Models
 const User = require('../models/user.model')
 const Account = require('../models/account.model')
+const Stock = require('../models/stock.model')
 
 // GraphQL Types
 const types = require('./types')
 
 // Resolvers
-const authResolver = require('../resolvers/auth.resolve')
 const stockResolver = require('../resolvers/stock.resolve')
 
 const {
@@ -21,20 +21,16 @@ const {
 module.exports = new GraphQLObjectType({
     name: 'RootQueryType',
     fields: {
-        // Auth Queries
-        login: {
-            description: "Check if user exists in db and return auth token",
-            type: types.AuthDataType,            
-            args: {
-                email: { type: GraphQLString },
-                password: { type: GraphQLString }
-            },
+        // Stock Queries
+        stock: {
+            description: "Retrieve stock from id",
+            type: types.StockType,
+            args: {id: { type: GraphQLID },},
             resolve(parent, args) {
-                return authResolver.login(args)
+                return Stock.findById(args.id)
             }
         },
 
-        // Stock Queries
         stocks: {
             description: "Retrieve stocks based on query params",
             type: new GraphQLList(types.StockType),
