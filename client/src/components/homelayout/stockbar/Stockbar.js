@@ -25,6 +25,7 @@ function Stockbar() {
                 <>
                     { stocks.data.stocks.map((stock, index) => {
                         if(inPortfolio(stock)) return(<Stockcard key={`stockcard-${index}`} props={{stock, index}}/>)
+                        return <div key={index}/>
                     })}
                 </>
             )

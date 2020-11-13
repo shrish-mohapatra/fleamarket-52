@@ -61,7 +61,7 @@ function OrderHistory() {
         const colors = {withdraw: 'gray', deposit: '#40A9FF', buy: 'green', sell: 'red'}
 
         return (
-            <Timeline.Item color={colors[order.action]} id={index}>
+            <Timeline.Item key={`transaction-${index}`} color={colors[order.action]} id={index}>
                 {order.description}
             </Timeline.Item>
         )

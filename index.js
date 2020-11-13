@@ -45,6 +45,12 @@ app.use('/api/rest/order', orderRouter);
 database.connectLocal();
 simulateCore();
 
+// React-client Route
+app.get("/*", (req, res) => {
+    const filePath = path.join(__dirname, 'client', 'build', 'index.html');
+    res.sendFile(filePath)
+})
+
 app.listen(port, () => {
     console.log("\nServer is running on port " + port);
 })

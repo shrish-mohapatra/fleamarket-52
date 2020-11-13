@@ -9,10 +9,12 @@ import { AuthProvider } from './AuthProvider';
 import { ApolloProvider, ApolloClient, createHttpLink, InMemoryCache } from '@apollo/client';
 import { setContext } from '@apollo/client/link/context';
 
+const { API_URL } = require("../../config.js");
+
 const httpLink = createHttpLink({
-    uri: 'http://localhost:8000/api/graph',
-  });
-  
+    uri: API_URL,
+});
+
 const authLink = setContext((_, { headers }) => {
     const token = localStorage.getItem('token')
 

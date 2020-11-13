@@ -1,4 +1,4 @@
-import React, { useContext, useEffect } from 'react';
+import React, { useContext } from 'react';
 import { Avatar, Skeleton } from 'antd';
 import { UserOutlined } from '@ant-design/icons';
 import { CoreContext } from '../../../store/providers/CoreProvider';

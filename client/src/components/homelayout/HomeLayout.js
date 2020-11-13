@@ -13,7 +13,7 @@ function HomeLayout() {
 
     useEffect(() => {
         local_auth()
-    }, [])
+    }, [local_auth])
 
     const renderLayout = () => (
         <Layout className="home-layout">

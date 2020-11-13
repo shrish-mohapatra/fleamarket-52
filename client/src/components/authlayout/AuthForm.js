@@ -1,4 +1,4 @@
-import React, {useState, useContext, useRef } from 'react'
+import React, {useContext, useRef } from 'react'
 import { Redirect } from 'react-router-dom'
 
 import {Form, Input, Checkbox, Button, notification} from 'antd'
@@ -75,7 +75,7 @@ function AuthForm({ formType }) {
         </Form>
     )
 
-    if(token != "") {
+    if(token !== "") {
         return <Redirect to='/home'/>
     }
 

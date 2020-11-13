@@ -15,9 +15,10 @@ export const CoreContext = createContext({
 
 export const CoreProvider = ({children}) => {
     const { userID, logout } = useContext(AuthContext);
-    
-    const user = useQuery(actions.getUser, {variables: { userID }, pollInterval: 500})
-    const stocks = useQuery(actions.getStocks, {pollInterval: 500})
+    const [pollInterval, setPollInterval] = useState(0);
+     
+    const user = useQuery(actions.getUser, {variables: { userID }, pollInterval})
+    const stocks = useQuery(actions.getStocks, {pollInterval})
 
     const [createOrder] = useMutation(actions.createOrder)
     const [changeBalance] = useMutation(actions.changeBalance)
@@ -31,7 +32,15 @@ export const CoreProvider = ({children}) => {
 
             logout()
         }
-    }, [stocks.error])
+    }, [stocks.error, userID, logout])
+
+    useEffect(() => {
+        if(userID !== "") {
+            setPollInterval(500)
+        } else {
+            setPollInterval(0)
+        }
+    }, [userID])
 
     const [stockRef, setstockRef] = useState(0);
     const [showPortfolio, setShowPortfolio] = useState(true);
@@ -73,7 +82,11 @@ export const CoreProvider = ({children}) => {
                     }
 
                     try {
-                        const result = await changeBalance({variables: args})
+                        await changeBalance({variables: args})
+                        notification['success']({
+                            message: 'Transaction Status',
+                            description: `Succesfully ${(amount<0)? "withdrew" : "deposited"} $${Math.abs(args.amount/100)}`
+                        })
                     } catch(error) {
                         console.log(error.message)
 
