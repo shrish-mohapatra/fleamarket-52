@@ -15,8 +15,7 @@ const { getPortfolio } = require("../api/resolvers/account.resolve");
 const REFRESH = 10; // in seconds
 
 /* Stock Data simulation parameters -------- */
-const SPREAD_FACTOR = 0.0086      // price % change between ask and bid
-const RANDOM_FACTOR = 0.00001     // price % change between refresh iterations
+const RANDOM_FACTOR = 0.001     // price % change between refresh iterations
 
 /*
     @desc    Core simulation process for stock market simulation
@@ -54,7 +53,7 @@ const simulateStockData = async (stockID, factor = RANDOM_FACTOR, ask = null, da
     await createStockData({
         stockID,
         ask,
-        bid: Math.floor(ask * (1 - SPREAD_FACTOR)),
+        bid: ask - Math.floor((Math.random() * 5)),
         date: date.format()
     })
 
@@ -66,7 +65,6 @@ const simulateStockData = async (stockID, factor = RANDOM_FACTOR, ask = null, da
     @desc    Generate new stock price data
 */
 const simulateMarket = async () => {
-    console.log('new data')
     let stocks = await getStocks({});
     
     for(let i=0; i<stocks.length; i++) {
@@ -191,7 +189,7 @@ const failOrder = (order, marketPrice) => {
 */
 const generateNextAsk = (ask, factor=RANDOM_FACTOR) => {
     const changeValue = Math.floor(Math.random() * ask * factor)
-    const changeDir = Math.round(Math.random()) ? -1 : 1;
+    const changeDir = (Math.round(Math.random()) * 2) - 1;
 
     return ask + (changeValue * changeDir);
 }

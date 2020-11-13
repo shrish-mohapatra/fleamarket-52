@@ -59,7 +59,6 @@ module.exports = {
         createAccount({
             userID: user.id,
             type: "Non-Registered",
-            balance: 1000,
         });
 
         return {

@@ -118,7 +118,7 @@ module.exports = {
             if(moment(result[i].date) >= compDate) newResult.push(result[i])
         }
 
-        return newResult.reverse()
+        return newResult.reverse().slice(1)
     },
 
 

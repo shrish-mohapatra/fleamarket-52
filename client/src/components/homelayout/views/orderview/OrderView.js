@@ -10,7 +10,7 @@ function OrderView() {
         <div>
             <Row gutter={16}>
                 <Col xs={24} lg={18}>                   
-                    <Card className="stockview-card" title="Order">
+                    <Card className="stockview-card" title="Order Form">
                         <OrderForm/>
                     </Card>
                     
