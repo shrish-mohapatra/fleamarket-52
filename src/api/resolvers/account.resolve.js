@@ -23,6 +23,20 @@ module.exports = {
 
 
     /*
+        @desc    Withdraw/deposit to account
+        @param   args: {accountID, amount}
+        @return  updated account MongoDB instance
+    */
+    changeBalance: async(args) => {
+        let {accountID, amount} = args;
+        let account = await Account.findById(accountID)
+        account.balance += amount
+        if(account.balance < 0) throw Error("Insufficient funds.");
+        return account.save()
+    },
+
+
+    /*
         @desc    Retrieve currently owned stocks
         @param   args: {accountID}
         @return  array of stocks with shares field (# shares owned)

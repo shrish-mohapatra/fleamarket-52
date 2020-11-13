@@ -47,12 +47,45 @@ module.exports = {
 
     /*
         @desc    Retrieve stocks based on query params
-        @param   args: {id*, ticker*, market*}  (* optional fields)
+        @param   args: {id*, ticker/symbol*, market*, minprice*, maxprice*}  (* optional fields)
         @return  array of stock MongoDB instances
     */
     getStocks: async(args) => {
+        // Query by ticker
+        if(args.symbol) {
+            args.ticker = args.symbol
+            delete args.symbol
+        }
+
+        // Extract price queries
+        let {minprice, maxprice} = args
+        if(minprice) {
+            minprice *= 100
+            delete args.minprice
+        } else if(maxprice) {
+            maxprice *= 100
+            delete args.maxprice
+        }
+
         let result = await Stock.find(args)
-        return result;
+        if(!minprice && !maxprice) return result;
+
+        // Filter by price
+        let newResults = []
+        
+        for(let i=0; i<result.length; i++) {
+            let stock = result[i]
+            let stockData = await fetchData({stockID: stock.id});
+            if(!stockData) continue;
+
+            let price = calculatePrice(stockData[0]);
+            if(!price) continue;
+
+            if(maxprice && price <= maxprice) newResults.push(stock)
+            if(minprice && price >= minprice) newResults.push(stock)
+        }
+
+        return newResults;
     },
 
 

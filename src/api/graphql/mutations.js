@@ -6,7 +6,7 @@ const types = require('./types')
 // Resolvers
 const { login, signup } = require('../resolvers/auth.resolve')
 const { createOrder, cancelOrder } = require('../resolvers/order.resolve')
-const { createAccount } = require('../resolvers/account.resolve')
+const { createAccount, changeBalance } = require('../resolvers/account.resolve')
 const { createStockData } = require('../resolvers/stock.resolve')
 
 const {
@@ -54,6 +54,18 @@ module.exports = new GraphQLObjectType({
             },
             resolve(parent, args) {
                 return createAccount(args)
+            }
+        },
+
+        changeBalance: {
+            description: "Withdraw/deposit to account balance",
+            type: types.AccountType,
+            args: {
+                accountID: { type: GraphQLString },
+                amount: { type: GraphQLInt },
+            },
+            resolve(parent, args) {
+                return changeBalance(args)
             }
         },
 

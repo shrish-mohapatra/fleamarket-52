@@ -71,4 +71,17 @@ export default {
             }
         }`
     ,
+    changeBalance: gql`
+        mutation changeBalance(
+            $accountID: String!,
+            $amount: Int!,
+        ) {
+            changeBalance(
+                accountID: $accountID,
+                amount: $amount,
+            ) {
+                balance
+            }
+        }`
+    ,
 }

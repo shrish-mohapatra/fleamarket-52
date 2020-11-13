@@ -16,9 +16,11 @@ export const CoreContext = createContext({
 export const CoreProvider = ({children}) => {
     const { userID, logout } = useContext(AuthContext);
     
-    const user = useQuery(actions.getUser, {variables: { userID }, pollInterval: 0})
-    const stocks = useQuery(actions.getStocks, {pollInterval: 0})
+    const user = useQuery(actions.getUser, {variables: { userID }, pollInterval: 500})
+    const stocks = useQuery(actions.getStocks, {pollInterval: 500})
+
     const [createOrder] = useMutation(actions.createOrder)
+    const [changeBalance] = useMutation(actions.changeBalance)
 
     useEffect(() => {
         if(stocks.error && userID) {
@@ -60,6 +62,24 @@ export const CoreProvider = ({children}) => {
                         notification['error']({
                             message: 'Order Status',
                             description: 'Something went wrong, order could not be created.'
+                        })
+                    }
+                },
+
+                changeBalance: async (amount) => {
+                    const args = {
+                        accountID: user?.data.user.accounts[0].id,
+                        amount: parseInt(amount),                        
+                    }
+
+                    try {
+                        const result = await changeBalance({variables: args})
+                    } catch(error) {
+                        console.log(error.message)
+
+                        notification['error']({
+                            message: 'Transaction Status',
+                            description: 'Insufficient funds.'
                         })
                     }
                 },
