@@ -15,10 +15,9 @@ export const CoreContext = createContext({
 
 export const CoreProvider = ({children}) => {
     const { userID, logout } = useContext(AuthContext);
-    const [pollInterval, setPollInterval] = useState(0);
      
-    const user = useQuery(actions.getUser, {variables: { userID }, pollInterval})
-    const stocks = useQuery(actions.getStocks, {pollInterval})
+    const user = useQuery(actions.getUser, {variables: { userID }})
+    const stocks = useQuery(actions.getStocks)
 
     const [createOrder] = useMutation(actions.createOrder)
     const [changeBalance] = useMutation(actions.changeBalance)
@@ -36,11 +35,19 @@ export const CoreProvider = ({children}) => {
 
     useEffect(() => {
         if(userID !== "") {
-            setPollInterval(500)
+            user.startPolling(2000)
         } else {
-            setPollInterval(0)
+            user.stopPolling()
         }
-    }, [userID])
+    }, [userID, user.startPolling, user.stopPolling])
+
+    useEffect(() => {
+        if(userID !== "") {
+            stocks.startPolling(1000)
+        } else {
+            stocks.stopPolling()
+        }
+    }, [userID, stocks.startPolling, stocks.stopPolling])
 
     const [stockRef, setstockRef] = useState(0);
     const [showPortfolio, setShowPortfolio] = useState(true);

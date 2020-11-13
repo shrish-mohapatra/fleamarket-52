@@ -90,8 +90,9 @@ const StockType = new GraphQLObjectType({
 
         data: {
             type: new GraphQLList(StockDataType),
+            args: {filter: { type: GraphQLString },},
             resolve(parent, args) {
-                return stockResolver.getStockData({ stockID: parent.id })
+                return stockResolver.getStockData({ stockID: parent.id, filter: args.filter })
             }
         },
 

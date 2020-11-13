@@ -2,8 +2,8 @@ const fs = require("fs");
 const moment = require("moment");
 
 const database = require("../../config/database");
-const { simulateStockData } = require("./simulate");
-const { createStock, createStockData } = require("../api/resolvers/stock.resolve");
+const { simulateStockDataOverTime } = require("./simulate");
+const { createStock } = require("../api/resolvers/stock.resolve");
 
 const SYMBOLS_FILE = "symbols.txt";
 const WEEKS_TO_SIM = 2
@@ -12,13 +12,24 @@ const WEEKS_TO_SIM = 2
 /*
     @desc    Core setup process for inital data generation
 */
-const setup = async () => {    
+const setup = async () => {
+    console.log("Setting up fleaDB.\n")
+
+    console.log("Parsing symbols...")
     let symbols = await parseSymbols();
-    if(!symbols) return;
+    if(!symbols) {
+        console.log("Could not parse symbols file.")
+        return;
+    }
 
     await database.connectLocal();
+
+    console.log("Populating stock data...")
     await populateStocks(symbols);
+    
     database.disconnect();
+
+    console.log("Setup completed.")
 }
 
 
@@ -64,12 +75,14 @@ const populateStocks = async (symbols) => {
             market: 'NASDAQ'
         });
 
-        await simulateStockData(
-            stock.id,
-            WEEKS_TO_SIM * 7,
-            "days",
-            data[2],
-            moment().subtract(WEEKS_TO_SIM * 7, 'days')
+        const startDate = moment().startOf('day').subtract(WEEKS_TO_SIM * 7, 'days')
+
+        await simulateStockDataOverTime(
+            stock.id,          // stockID
+            WEEKS_TO_SIM * 7,  // timeAmount
+            "days",            // timeUnit
+            data[2],           // startPrice
+            startDate,         // startDate
         );
     }
 }

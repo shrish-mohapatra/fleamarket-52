@@ -34,6 +34,15 @@ module.exports = {
     createStockData: async(args) => {
         let {stockID, ask, bid, date} = args;
 
+        // Check and delete latest stock data if its new data since today's open
+        let pastData = await fetchData({stockID})
+        if(pastData) {
+            const lastUpdated = moment(pastData[0].date)
+            const lastDay = moment(pastData[0].date).startOf('day')
+
+            if(lastUpdated > lastDay) await StockData.findByIdAndDelete(pastData[0].id)
+        }
+
         let stockData = await new StockData({
             stockID,
             ask,
@@ -71,7 +80,7 @@ module.exports = {
         if(!minprice && !maxprice) return result;
 
         // Filter by price
-        let newResults = []
+        let newResult = []
         
         for(let i=0; i<result.length; i++) {
             let stock = result[i]
@@ -81,21 +90,35 @@ module.exports = {
             let price = calculatePrice(stockData[0]);
             if(!price) continue;
 
-            if(maxprice && price <= maxprice) newResults.push(stock)
-            if(minprice && price >= minprice) newResults.push(stock)
+            if(maxprice && price <= maxprice) newResult.push(stock)
+            if(minprice && price >= minprice) newResult.push(stock)
         }
 
-        return newResults;
+        return newResult;
     },
 
 
     /*
         @desc    Retreive stockData for specific stock (sorted reverse chronologically)
-        @param   args: {stockID}
+        @param   args: {stockID, filter*: 'days', null}
         @return  array stockData MongoDB instances
     */
     getStockData: async(args) => {
-        return fetchData(args);
+        let result = await fetchData(args);
+        if(!args.filter || !result) return result
+
+        // Filter stock data by 'days', 'weeks', etc..
+        let newResult = []
+        newResult.push(result[0])
+
+        let compDate = moment(result[0].date)
+
+        for(let i=1; i<result.length; i++) {
+            compDate = compDate.add(1, args.filter)
+            if(moment(result[i].date) >= compDate) newResult.push(result[i])
+        }
+
+        return newResult.reverse()
     },
 
 

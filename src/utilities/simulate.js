@@ -9,21 +9,21 @@ const moment = require("moment");
 const Order = require("../api/models/order.model");
 const Account = require("../api/models/account.model");
 
-const { createStockData, getStockPrice } = require("../api/resolvers/stock.resolve");
+const { createStockData, getStockPrice, getStocks } = require("../api/resolvers/stock.resolve");
 const { getPortfolio } = require("../api/resolvers/account.resolve");
 
 const REFRESH = 10; // in seconds
 
-// Stock Data simulation parameters
-const SPREAD_FACTOR = 0.0086
-const RANDOM_FACTOR = 0.1
+/* Stock Data simulation parameters -------- */
+const SPREAD_FACTOR = 0.0086      // price % change between ask and bid
+const RANDOM_FACTOR = 0.00001     // price % change between refresh iterations
 
 /*
     @desc    Core simulation process for stock market simulation
     @notes   Uses 'setInterval()' to repeat process every X seconds
 */
 const simulateCore = async () => {
-    setInterval(simulateOrders, REFRESH * 1000);
+    setInterval(simulateMarket, REFRESH * 1000);  
 }
 
 
@@ -32,21 +32,48 @@ const simulateCore = async () => {
     @params  (stockID, timeAmount, timeUnit, startPrice, startDate*) *optional
     @usage   ex. simulateStockData(<STOCKID>, 7, "days", 12345)
 */
-const simulateStockData = async (stockID, timeAmount, timeUnit, startPrice, startDate = moment()) => {
+const simulateStockDataOverTime = async (stockID, timeAmount, timeUnit, startPrice, startDate = moment()) => {
     let ask = parseInt(startPrice);
     let date = startDate;
 
     for(let i=0; i<timeAmount; i++) {
-        await createStockData({
-            stockID,
-            ask,
-            bid: Math.floor(ask * (1 - SPREAD_FACTOR)),
-            date: date.format()
-        })
-
-        ask = generateNextAsk(ask);
+        ask = await simulateStockData(stockID, 0.1, ask, date);
         date = date.add(1, timeUnit);
     }
+}
+
+
+/*
+    @desc    Create stockData, simulating ask and bid prices
+    @params  (stockID, factor*: price % change, startPrice*, date*) *optional
+    @return  new ask price
+*/
+const simulateStockData = async (stockID, factor = RANDOM_FACTOR, ask = null, date = moment()) => {
+    ask = generateNextAsk(ask || await getStockPrice({stockID}), factor)
+
+    await createStockData({
+        stockID,
+        ask,
+        bid: Math.floor(ask * (1 - SPREAD_FACTOR)),
+        date: date.format()
+    })
+
+    return ask
+}
+
+
+/*
+    @desc    Generate new stock price data
+*/
+const simulateMarket = async () => {
+    console.log('new data')
+    let stocks = await getStocks({});
+    
+    for(let i=0; i<stocks.length; i++) {
+        await simulateStockData(stocks[i].id)
+    }
+
+    await simulateOrders()
 }
 
 
@@ -159,11 +186,11 @@ const failOrder = (order, marketPrice) => {
 
 /*
     @desc    Randomly generate next stock ask price
-    @params  (ask)
+    @params  (ask, factor*: amount of change in %)
     @return  int: new ask price
 */
-const generateNextAsk = (ask) => {
-    const changeValue = Math.floor(Math.random() * ask * RANDOM_FACTOR)
+const generateNextAsk = (ask, factor=RANDOM_FACTOR) => {
+    const changeValue = Math.floor(Math.random() * ask * factor)
     const changeDir = Math.round(Math.random()) ? -1 : 1;
 
     return ask + (changeValue * changeDir);
@@ -172,5 +199,5 @@ const generateNextAsk = (ask) => {
 
 module.exports = {
     simulateCore,
-    simulateStockData
+    simulateStockDataOverTime
 };

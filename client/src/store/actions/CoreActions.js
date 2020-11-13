@@ -29,7 +29,7 @@ export default {
                 low
                 ask
                 bid
-                data {
+                data(filter: "days") {
                     date
                     ask
                     bid
