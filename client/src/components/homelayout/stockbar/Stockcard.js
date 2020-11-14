@@ -32,7 +32,7 @@ function Stockcard({props: {stock, index}}) {
         <div className={getCardClass()} onClick={() => selectStock(index)}>
             <p className="stockcard-ticker">{stock.ticker}</p>
             {renderChange(stock.change)}
-        <p className="stockcard-price">${stock.price/100}{stock.shares? `x ${stock.shares}` : ''}</p>
+            <p className="stockcard-price">${stock.price/100}{stock.shares? `x ${stock.shares}` : ''}</p>
         </div>
     );
 }

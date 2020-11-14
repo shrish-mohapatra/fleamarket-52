@@ -12,6 +12,17 @@ export default {
                         id
                         shares
                     }
+                    orders{
+                        id
+                        stock{
+                            ticker
+                        }
+                        action
+                        quantity
+                        price
+                        completed
+                        failed
+                    }
                 }
             }
         }`
@@ -81,6 +92,15 @@ export default {
                 amount: $amount,
             ) {
                 balance
+            }
+        }`
+    ,
+    cancelOrder: gql`
+        mutation cancelOrder(
+            $orderID: String!,
+        ) {
+            cancelOrder(orderID: $orderID){
+                failed
             }
         }`
     ,

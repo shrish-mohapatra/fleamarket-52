@@ -20,7 +20,8 @@ export const CoreProvider = ({children}) => {
     const stocks = useQuery(actions.getStocks)
 
     const [createOrder] = useMutation(actions.createOrder)
-    const [changeBalance] = useMutation(actions.changeBalance)
+    const [cancelOrder] = useMutation(actions.cancelOrder)
+    const [changeBalance] = useMutation(actions.changeBalance)    
 
     useEffect(() => {
         if(stocks.error && userID) {
@@ -39,7 +40,7 @@ export const CoreProvider = ({children}) => {
         } else {
             user.stopPolling()
         }
-    }, [userID, user.startPolling, user.stopPolling])
+    }, [userID, user])
 
     useEffect(() => {
         if(userID !== "") {
@@ -47,7 +48,7 @@ export const CoreProvider = ({children}) => {
         } else {
             stocks.stopPolling()
         }
-    }, [userID, stocks.startPolling, stocks.stopPolling])
+    }, [userID, stocks])
 
     const [stockRef, setstockRef] = useState(0);
     const [showPortfolio, setShowPortfolio] = useState(true);
@@ -78,6 +79,24 @@ export const CoreProvider = ({children}) => {
                         notification['error']({
                             message: 'Order Status',
                             description: 'Something went wrong, order could not be created.'
+                        })
+                    }
+                },
+
+                cancelOrder: async (args) => {                   
+                    try {
+                        await cancelOrder({variables: args})
+
+                        notification['info']({
+                            message: 'Order Status',
+                            description: `Your order for has been cancelled.`
+                        })
+                    } catch(error) {
+                        console.log(error.message)
+
+                        notification['error']({
+                            message: 'Order Status',
+                            description: 'Something went wrong, order could not be cancelled.'
                         })
                     }
                 },

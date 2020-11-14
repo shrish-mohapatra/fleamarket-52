@@ -1,12 +1,17 @@
 import React, { useContext } from 'react';
 import { CoreContext } from '../../../store/providers/CoreProvider';
+
 import { Layout, Skeleton } from 'antd';
+import { useLocation } from 'react-router-dom';
+
 import Stockcard from './Stockcard';
+import Ordercard from "./Ordercard";
 
 const { Sider } = Layout;
 
 function Stockbar() {
     const { stocks, user, showPortfolio } = useContext(CoreContext);
+    const location = useLocation();
 
     const inPortfolio = (stock) => {
         if(!showPortfolio) return true
@@ -19,7 +24,7 @@ function Stockbar() {
         return false
     }
 
-    const renderCards = () => {
+    const renderStocks = () => {
         if(stocks.data && user.data) {
             return (
                 <>
@@ -32,6 +37,25 @@ function Stockbar() {
                 </>
             )
         }
+    }
+
+    const renderOrders = () => {
+        if(user.data) {
+            const orders = [...user.data.user.accounts[0].orders].reverse()
+            return (
+                <>
+                    { orders.map((order, index) => (
+                        <Ordercard key={`ordercard-${index}`} props={{order, index}}/>
+                    ))}
+                </>
+            )
+        }
+    }
+
+    const renderCards = () => {
+        const { pathname } = location
+        if(pathname === "/home" || pathname === "/home/stock") return renderStocks()
+        return renderOrders()
     }
 
     return (

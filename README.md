@@ -47,6 +47,11 @@
     - Confirm order
     - Will recieve notifcations regarding order status~
 
+- View Orders
+    - Select *Orders* from sidebar
+    - Created buy/sell orders will appear in the stockbar
+    - Can cancel pending orders by right-clicking card
+
 ~ features are still in progress
 
 ---
