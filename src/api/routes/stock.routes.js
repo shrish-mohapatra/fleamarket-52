@@ -5,6 +5,8 @@ const restWrapper = require("../resolvers/wrappers/restWrapper")
 const router = express.Router()
 
 router.get('/stocks', (req, res) => restWrapper(req, res, resolve.getStocks))
+router.get('/stocks/:symbol', (req, res) => restWrapper(req, res, resolve.getStockData))
+router.get('/stocks/:symbol/history', (req, res) => restWrapper(req, res, resolve.getStockHistory))
 router.get('/stockData', (req, res) => restWrapper(req, res, resolve.getStockData))
 
 router.post('/stocks', (req, res) => restWrapper(req, res, resolve.createStock))

@@ -3,6 +3,8 @@ const moment = require("moment");
 const Stock = require("../models/stock.model");
 const StockData = require("../models/stockData.model");
 
+const { getOrders } = require("./order.resolve");
+
 // Note that all numerical data has scale factor of 100
 // ex. price = 12345 => $123.45
 
@@ -104,6 +106,10 @@ module.exports = {
         @return  array stockData MongoDB instances
     */
     getStockData: async(args) => {
+        if(args.symbol) {
+            args.stockID = (await Stock.findOne({ticker: args.symbol})).id
+        }
+
         let result = await fetchData(args);
         if(!args.filter || !result) return result
 
@@ -119,6 +125,24 @@ module.exports = {
         }
 
         return newResult.reverse().slice(1)
+    },
+
+    /*
+        @desc    Retrieve latest stock orders
+        @param   args: {symbol}
+        @return  array of order MongoDB instances
+    */
+    getStockHistory: async(args) => {
+        if(args.symbol) {
+            args.stockID = (await Stock.findOne({ticker: args.symbol})).id
+        }
+
+        let orders = await getOrders({
+            stockID: args.stockID,
+            completed: { $ne: "" },
+            failed: { $ne: true }
+        })
+        return orders
     },
 
 

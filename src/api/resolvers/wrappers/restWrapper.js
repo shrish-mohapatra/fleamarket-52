@@ -7,7 +7,14 @@ const restWrapper = async (req, res, resolve) => {
     let args = req.body;
 
     // User query parameters as arguments if they exist
-    if(Object.keys(req.query).length != 0) args = req.query;
+    if(Object.keys(req.query).length != 0) {
+        args = Object.assign(args, req.query);
+    }
+
+    // ID params as arguments if they exist
+    if(Object.keys(req.params).length != 0) {
+        args = Object.assign(args, req.params);
+    }
 
     resolve(args)
         .then(result => {
