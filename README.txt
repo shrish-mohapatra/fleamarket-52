@@ -3,14 +3,91 @@
 > Developed by Shrish Mohapatra.
 
 ## Running application
-1. After cloning the repo, run the following commands
-```
-    cd ~/fleamarket52
-    npm i
-    npm run dev
-```
-2. Visit (http://localhost:8000) to view application.
+1. Connect to instance with: `ssh student@134.117.133.178`
+    - Password is `Fle@@20!?`
+2. Run the following commands:
+    ```
+    cd src
+    npm run cleanup          \\ Deletes all collections
+    npm run setup            \\ Create stocks & initial data from symbols.txt
+    npm start                \\ Runs server on port 8000
+    ```
+3. In another terminal create a tunnel with:
+    `ssh -L 9999:localhost:8000 student@134.117.133.178`
+4. Visit (http://localhost:9999) to view application.
 
+
+## Features
+- Signup/Login
+    - Create an account or login with existing email and password
+    - Recieve notifcations for invalid credentials
+    - Try logging in with: {email: `test@gmail.com`, password:`password`}
+
+- Withdraw/Deposit funds
+    - Before you can buy stocks you will need funds
+    - Select *Orders* from sidebar and navigate to *Manage Funds*
+    - Withdraw/deposit funds, will recieve notification regarding status
+
+- View Stocks
+    - Select *Dashboard/All Stocks* from sidebar to start viewing stocks
+    - Select stocks from scrollable stockbar
+    - View dynamic stock price graphs for past 2 weeks
+    - Stock stats such as ask, bid, open, high, low, volume~
+    - Quick order (buy/sell) stocks
+    - View latest news updates regarding company~
+
+- Create Orders
+    - Select *Orders* from sidebar and navigate to *Order Form*
+    - Select symbol/ticker from available options
+    - Select price type (market or limit)        
+    - Change price if limit order
+    - Select action (buy or sell)
+    - Select quantity
+    - Select expiry date~
+    - Confirm order
+    - Will recieve notifcations regarding order status~
+
+- View Orders
+    - Select *Orders* from sidebar
+    - Created buy/sell orders will appear in the stockbar
+    - Can cancel pending orders by right-clicking card
+
+~ features are still in progress
+
+---
+
+## Check-In #3 Breakdown
+
+### Extensions
+- Connected to MongoDB database
+    - Created `setup` script to initalize database
+    - Created `cleanup` script to delete all collections from database
+    - Used *mongoose* to define schemas for various data models (ex. users, stocks)
+
+- Used React as a frontend framework
+    - Node.js server configured to render the client app
+    - Use JWT for authentication (server creates token, client app stores token locally)
+    - Please refer to `Client Structure` section for more information regarding React setup
+
+- Implemented GraphQL API
+    - Defined data relationships between models such as stocks and stockData
+    - Linked GraphQL queries and mutations to resolver functions which manage business logic (ex. login, createOrder)
+    - Used ApolloClient for React to connect to GraphQL server
+    - Use "polling" to retrieve data from server every X seconds
+
+### Design Decisions
+The application has been structured in a modular manner, encouraging reusability and clear organization.
+
+I have defined the REST API endpoints in the `/api/routes` directory which map URL paths to logic functions. This allows for a clear understanding of the interface for the REST API, and leaves out the details of the implementation.
+
+Similarily, I have implemented GraphQL types, queries, and mutations (found in the `/api/graphql` directory) which once again only contain details of the interface and not the implementation. GraphQL also allows for a dynamic API docs which can be seen here: (http://localhost:9999/api/graph).
+
+While the REST routes and GraphQL methods represent the API's interface, I have created *resolver* functions which include details of the implementation (can be found in the `/api/resolvers/` directory). These functions aim resolve client requests by performing the actions neccesary and returning the required data. They have been further organized based on the general features (ex. `auth.resolve.js` handles authentication logic, `order.resolve.js` handles stock order logic). Certain resolver functions could be used in other programs (ex. authentication), making this system useful.
+
+By distinguishing between interface and implementation, I'm able to configure both REST routes and GraphQL to use the same business logic found in the resolvers.
+
+
+---
 
 ## Check-In #2 Breakdown
 
@@ -141,6 +218,8 @@ This is a hierachal representation of the key components for the Node.js server.
 └── package.json
 ```
 
+
+---
 
 ## Check-In #1 Breakdown
 
