@@ -2,11 +2,11 @@ const mongoose = require("mongoose");
 const database = require("../../config/database");
 
 const COLLECTIONS_TO_REMOVE = [
-    //'accounts',
+    'accounts',
     'orders',
     'stockdatas',
     'stocks',
-    //'users',
+    'users',
 ]
 
 /*
