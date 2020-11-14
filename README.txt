@@ -21,7 +21,6 @@
 - Signup/Login
     - Create an account or login with existing email and password
     - Recieve notifcations for invalid credentials
-    - Try logging in with: {email: `test@gmail.com`, password:`password`}
 
 - Withdraw/Deposit funds
     - Before you can buy stocks you will need funds
