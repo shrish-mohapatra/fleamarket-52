@@ -1,6 +1,5 @@
 /*
     @TODO
-        - socket notification to client informing of order status
         - incorporate expiry date
 */
 
@@ -17,6 +16,7 @@ const REFRESH = 10; // in seconds
 /* Stock Data simulation parameters -------- */
 const RANDOM_FACTOR = 0.001     // price % change between refresh iterations
 
+
 /*
     @desc    Core simulation process for stock market simulation
     @notes   Uses 'setInterval()' to repeat process every X seconds
@@ -29,7 +29,7 @@ const simulateCore = async () => {
 /*
     @desc    Create certain amount of time worth of stockData
     @params  (stockID, timeAmount, timeUnit, startPrice, startDate*) *optional
-    @usage   ex. simulateStockData(<STOCKID>, 7, "days", 12345)
+    @usage   ex. simulateStockData(<STOCKID>, 7, "days", 12345) => simulate a week's worth of stockdata
 */
 const simulateStockDataOverTime = async (stockID, timeAmount, timeUnit, startPrice, startDate = moment()) => {
     let ask = parseInt(startPrice);
@@ -53,8 +53,9 @@ const simulateStockData = async (stockID, factor = RANDOM_FACTOR, ask = null, da
     await createStockData({
         stockID,
         ask,
-        bid: ask - Math.floor((Math.random() * 5)),
-        date: date.format()
+        bid: ask - Math.floor((Math.random() * 2)),
+        date: date.format(),
+        volume: 1,
     })
 
     return ask

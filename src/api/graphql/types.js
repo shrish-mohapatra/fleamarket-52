@@ -158,6 +158,15 @@ const StockType = new GraphQLObjectType({
                 })
             }
         },
+
+        volume: {
+            type: GraphQLInt,
+            resolve(parent, args) {
+                return stockResolver.getStockVolume({
+                    stockID: parent._id
+                })
+            }
+        },
     })
 })
 
@@ -169,6 +178,9 @@ const StockDataType = new GraphQLObjectType({
         date: { type: GraphQLString },
         ask: { type: GraphQLInt },
         bid: {type: GraphQLInt},
+        high: {type: GraphQLInt},
+        low: {type: GraphQLInt},
+        volume: {type: GraphQLInt},
 
         stock: {
             type: StockType,

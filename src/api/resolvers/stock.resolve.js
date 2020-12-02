@@ -30,11 +30,11 @@ module.exports = {
 
     /*
         @desc    Create stockData instance with price data
-        @param   args: {stockID, ask, bid, date*}  (* optional fields)
+        @param   args: {stockID, ask, bid, high*, low*, volume*, date*}  (* optional fields)
         @return  stockData MongoDB instance
     */
     createStockData: async(args) => {
-        let {stockID, ask, bid, date} = args;
+        let {stockID, ask, bid, date, high, low, volume} = args;
 
         // Check and delete latest stock data if its new data since today's open
         let pastData = await fetchData({stockID})
@@ -42,13 +42,21 @@ module.exports = {
             const lastUpdated = moment(pastData[0].date)
             const lastDay = moment(pastData[0].date).startOf('day')
 
-            if(lastUpdated > lastDay) await StockData.findByIdAndDelete(pastData[0].id)
+            if(lastUpdated > lastDay) {
+                high = Math.max(ask, pastData[0].high);
+                low = Math.min(bid, pastData[0].low);
+                volume += pastData[0].volume;
+                await StockData.findByIdAndDelete(pastData[0].id)
+            }
         }
 
         let stockData = await new StockData({
             stockID,
             ask,
             bid,
+            high: high || ask,
+            low: low || bid,
+            volume,
             date: date || moment().format()
         });
 
@@ -191,10 +199,10 @@ module.exports = {
         @return  price
     */
     getStockHigh: async(args) => {
-        let stockData = await fetchData({...args, filter: '-ask'});
+        let stockData = await fetchData({...args, filter: '-high'});
         if(!stockData) return null;
 
-        return stockData[0].ask;
+        return stockData[0].high;
     },
 
     /*
@@ -203,10 +211,28 @@ module.exports = {
         @return  price
     */
     getStockLow: async(args) => {
-        let stockData = await fetchData({...args, filter: 'bid'});
+        let stockData = await fetchData({...args, filter: 'low'});
         if(!stockData) return null;
 
-        return stockData[0].bid;
+        return stockData[0].low;
+    },
+
+    /*
+        @desc    Retrieve number of stock trades
+        @param   args: {stockID}
+        @return  price
+    */
+    getStockVolume: async(args) => {
+        let stockData = await fetchData({...args});
+        if(!stockData) return null;
+
+        let volume = 0;
+
+        for(let i=0; i<stockData.length; i++) {
+            volume += stockData[i].volume;
+        }
+
+        return volume;
     },
 
     /*
@@ -227,12 +253,15 @@ module.exports = {
     }, 
 
     /*
+        @desc    Retrieve stock open price
+        @param   args: {stockID}
+        @return  open price / prev close price
     */
-   getStockOpen: async(args) => {
-       let prevClose = await getPrevClose(args);
-       if(!prevClose) return null;
-       return prevClose;
-   }
+    getStockOpen: async(args) => {
+        let prevClose = await getPrevClose(args);
+        if(!prevClose) return null;
+        return prevClose;
+    }
 }
 
 
