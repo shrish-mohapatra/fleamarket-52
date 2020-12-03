@@ -10,12 +10,14 @@ const types = require('./types')
 
 // Resolvers
 const stockResolver = require('../resolvers/stock.resolve')
+const adminResolver = require('../resolvers/admin.resolve')
 
 const {
     GraphQLObjectType,
     GraphQLString,
     GraphQLID,
     GraphQLList,
+    GraphQLInt
 } = graphql;
 
 module.exports = new GraphQLObjectType({
@@ -67,5 +69,14 @@ module.exports = new GraphQLObjectType({
                 return Account.find({})
             }
         },
+
+        // Admin queries
+        getDayOffset: {
+            type: GraphQLInt,
+            resolve(parent, args) {
+                return adminResolver.getDayOffset()
+            }
+        },
+
     }
 })

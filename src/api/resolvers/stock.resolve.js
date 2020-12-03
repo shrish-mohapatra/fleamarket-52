@@ -4,6 +4,7 @@ const Stock = require("../models/stock.model");
 const StockData = require("../models/stockData.model");
 
 const { getOrders } = require("./order.resolve");
+const { getDayOffset } = require("./admin.resolve");
 
 // Note that all numerical data has scale factor of 100
 // ex. price = 12345 => $123.45
@@ -35,14 +36,17 @@ module.exports = {
     */
     createStockData: async(args) => {
         let {stockID, ask, bid, date, high, low, volume} = args;
+        let dayOffset = await getDayOffset();
 
         // Check and delete latest stock data if its new data since today's open
         let pastData = await fetchData({stockID})
         if(pastData) {
             const lastUpdated = moment(pastData[0].date)
-            const lastDay = moment(pastData[0].date).startOf('day')
+            const curDate = (date)? moment(date) : moment().add(dayOffset, "days")
 
-            if(lastUpdated > lastDay) {
+            const duration = moment.duration(curDate.diff(lastUpdated)).asDays()
+
+            if(duration < 1) {
                 high = Math.max(ask, pastData[0].high);
                 low = Math.min(bid, pastData[0].low);
                 volume += pastData[0].volume;
@@ -57,7 +61,7 @@ module.exports = {
             high: high || ask,
             low: low || bid,
             volume,
-            date: date || moment().format()
+            date: date || moment().add(dayOffset, "days").format()
         });
 
         return stockData.save();

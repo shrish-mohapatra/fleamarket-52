@@ -1,9 +1,8 @@
 const moment = require("moment");
 
 const Order = require("../models/order.model");
-const Account = require("../models/account.model");
 
-const { getStockPrice } = require("./stock.resolve");
+const { getDayOffset } = require("./admin.resolve");
 
 module.exports = {
 
@@ -14,6 +13,7 @@ module.exports = {
     */
     createOrder: async(args) => {
         let {accountID, stockID, action, quantity, price, expiry} = args;                      
+        let dayOffset = await getDayOffset();
 
         let order = await new Order({
             accountID,
@@ -23,7 +23,7 @@ module.exports = {
             price: price || null,
             expiry: expiry || "",
             completed: "",
-            date: moment().format(),
+            date: moment().add(dayOffset, "days").format(),
         });
 
         return order.save();
@@ -48,8 +48,10 @@ module.exports = {
     */
     cancelOrder: async(args) => {
         let order = await Order.findById(args.orderID)
+        let dayOffset = await getDayOffset();
+        
         order.failed = true;
-        order.completed = moment().format();
+        order.completed = moment().add(dayOffset, "days").format();
         
         return order.save();
     }

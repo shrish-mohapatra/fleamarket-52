@@ -8,6 +8,7 @@ const { login, signup } = require('../resolvers/auth.resolve')
 const { createOrder, cancelOrder } = require('../resolvers/order.resolve')
 const { createAccount, changeBalance } = require('../resolvers/account.resolve')
 const { createStockData } = require('../resolvers/stock.resolve')
+const { editDayOffset } = require('../resolvers/admin.resolve')
 
 const {
     GraphQLObjectType,
@@ -87,6 +88,7 @@ module.exports = new GraphQLObjectType({
         },
 
         cancelOrder: {
+            description: "Cancel stock buy/sell order",
             type: types.OrderType,
             args: { orderID: { type: GraphQLString } },
             resolve(parent, args) {
@@ -96,6 +98,7 @@ module.exports = new GraphQLObjectType({
 
         // Stock Data Mutations
         createStockData: {
+            description: "Create stock data.",
             type: types.StockDataType,
             args: {
                 stockID: { type: GraphQLString },
@@ -105,6 +108,20 @@ module.exports = new GraphQLObjectType({
             },
             resolve(parent, args) {
                 return createStockData(args)
+            }
+        },
+
+
+        // Admin Mutations
+        editDayOffset: {
+            description: "Edit server date.",
+            type: GraphQLString,
+            args: {
+                days: { type: GraphQLInt },
+            },
+            resolve(parent, args) {
+                editDayOffset(args);
+                return "Success";
             }
         },
     }

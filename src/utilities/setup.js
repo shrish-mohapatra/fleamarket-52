@@ -4,6 +4,8 @@ const moment = require("moment");
 const database = require("../../config/database");
 const { simulateStockDataOverTime } = require("./simulate");
 const { createStock } = require("../api/resolvers/stock.resolve");
+const { signup } = require("../api/resolvers/auth.resolve");
+const { createAdmin } = require("../api/resolvers/admin.resolve");
 
 const SYMBOLS_FILE = "symbols.txt";
 const WEEKS_TO_SIM = 2
@@ -15,20 +17,16 @@ const WEEKS_TO_SIM = 2
 const setup = async () => {
     console.log("Setting up fleaDB.\n")
 
-    console.log("Parsing symbols...")
     let symbols = await parseSymbols();
-    if(!symbols) {
-        console.log("Could not parse symbols file.")
-        return;
-    }
+    if(!symbols) return;
 
-    await database.connectLocal();
+    await database.connectLocal();    
 
-    console.log("Populating stock data...")
-    await populateStocks(symbols);
-    
+    await createAdmin();
+    await populateUsers();
+    await populateStocks(symbols);    
+
     database.disconnect();
-
     console.log("Setup completed.")
 }
 
@@ -39,6 +37,8 @@ const setup = async () => {
     @return  symbols: ["<TICKER>:<NAME>:<START_PRICE>"]
 */
 const parseSymbols = async()  => {
+    console.log("Parsing symbols...")
+
     let results = []
 
     try {
@@ -56,6 +56,7 @@ const parseSymbols = async()  => {
         return results
     } catch(error) {
         console.log(error);
+        console.log("Could not parse symbols file.")
         return null;
     }
 }
@@ -66,6 +67,8 @@ const parseSymbols = async()  => {
     @params  symbols: ["<TICKER>:<NAME>:<START_PRICE>"]
 */
 const populateStocks = async (symbols) => {
+    console.log("Populating stock data...")
+
     for(let i=0; i < symbols.length; i++) {
         data = symbols[i].split(':');
 
@@ -85,6 +88,20 @@ const populateStocks = async (symbols) => {
             startDate,         // startDate
         );
     }
+}
+
+
+/*
+    @desc    Create MongoDB instances of users for testing
+    @note    test1 will be a new user, test2 will be a user with some orders
+*/
+const populateUsers = async() => {
+    console.log("Populating user data...")
+
+    const { userID1 } = await signup({
+        email: 'test1',
+        password: 'password'
+    })
 }
 
 setup();

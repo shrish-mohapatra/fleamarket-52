@@ -10,18 +10,21 @@ const Account = require("../api/models/account.model");
 
 const { createStockData, getStockPrice, getStocks } = require("../api/resolvers/stock.resolve");
 const { getPortfolio } = require("../api/resolvers/account.resolve");
+const { getDayOffset } = require("../api/resolvers/admin.resolve");
 
 const REFRESH = 10; // in seconds
 
 /* Stock Data simulation parameters -------- */
 const RANDOM_FACTOR = 0.001     // price % change between refresh iterations
 
+let curDayOffset = 0;
 
 /*
     @desc    Core simulation process for stock market simulation
     @notes   Uses 'setInterval()' to repeat process every X seconds
 */
 const simulateCore = async () => {
+    curDayOffset = await getDayOffset();
     setInterval(simulateMarket, REFRESH * 1000);  
 }
 
@@ -54,7 +57,7 @@ const simulateStockData = async (stockID, factor = RANDOM_FACTOR, ask = null, da
         stockID,
         ask,
         bid: ask - Math.floor((Math.random() * 2)),
-        date: date.format(),
+        date: date.add(curDayOffset, "days").format(),
         volume: 1,
     })
 
@@ -67,12 +70,24 @@ const simulateStockData = async (stockID, factor = RANDOM_FACTOR, ask = null, da
 */
 const simulateMarket = async () => {
     let stocks = await getStocks({});
-    
-    for(let i=0; i<stocks.length; i++) {
-        await simulateStockData(stocks[i].id)
-    }
+    let dayOffset = await getDayOffset();
 
-    await simulateOrders()
+    const iterations = (dayOffset-curDayOffset) + 1;
+    let factor = (iterations > 1)? 0.1 : RANDOM_FACTOR;
+
+    // need to test this though
+
+    for(let i=0; i<iterations; i++) {
+        for(let j=0; j<stocks.length; j++) {
+            await simulateStockData(stocks[j].id, factor)
+        }
+    
+        await simulateOrders()
+
+        if(dayOffset != curDayOffset) {
+            curDayOffset += 1;
+        }
+    }    
 }
 
 
@@ -108,7 +123,7 @@ const processAction = async (order) => {
     console.log("Succesful order")
 
     // Complete order
-    order.completed = moment().format();
+    order.completed = moment().add(curDayOffset, "days").format();
     order.price = marketPrice;
     order.save();
 }
@@ -176,7 +191,7 @@ const processSell = async (order, account, marketPrice) => {
     @params  order, marketPrice
 */
 const failOrder = (order, marketPrice) => {
-    order.completed = moment().format();
+    order.completed = moment().add(curDayOffset, "days").format();
     order.failed = true;
     order.price = marketPrice;
     order.save();

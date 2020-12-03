@@ -40,7 +40,7 @@ export default {
                 low
                 ask
                 bid
-                data(filter: "days") {
+                data {
                     date
                     ask
                     bid
@@ -102,6 +102,20 @@ export default {
             cancelOrder(orderID: $orderID){
                 failed
             }
+        }`
+    ,
+
+    getDayOffset: gql`
+        query getDayOffset {
+            getDayOffset
+        }`
+    ,
+
+    editDayOffset: gql`
+        mutation editDayOffset(
+            $days: Int!,
+        ) {
+            editDayOffset(days: $days)
         }`
     ,
 }

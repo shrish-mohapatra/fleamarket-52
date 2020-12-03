@@ -18,10 +18,12 @@ export const CoreProvider = ({children}) => {
      
     const user = useQuery(actions.getUser, {variables: { userID }})
     const stocks = useQuery(actions.getStocks)
+    const dayOffset = useQuery(actions.getDayOffset)
 
     const [createOrder] = useMutation(actions.createOrder)
     const [cancelOrder] = useMutation(actions.cancelOrder)
-    const [changeBalance] = useMutation(actions.changeBalance)    
+    const [changeBalance] = useMutation(actions.changeBalance)
+    const [editDayOffset] = useMutation(actions.editDayOffset)
 
     useEffect(() => {
         if(stocks.error && userID) {
@@ -50,6 +52,14 @@ export const CoreProvider = ({children}) => {
         }
     }, [userID, stocks])
 
+    useEffect(() => {
+        if(userID !== "") {
+            dayOffset.startPolling(1000)
+        } else {
+            dayOffset.stopPolling()
+        }
+    }, [userID, dayOffset])
+
     const [stockRef, setstockRef] = useState(0);
     const [showPortfolio, setShowPortfolio] = useState(true);
 
@@ -57,6 +67,7 @@ export const CoreProvider = ({children}) => {
         <CoreContext.Provider
             value={{
                 user,
+                dayOffset,
                 stockRef,
                 stocks,
                 showPortfolio,
@@ -119,6 +130,21 @@ export const CoreProvider = ({children}) => {
                         notification['error']({
                             message: 'Transaction Status',
                             description: 'Insufficient funds.'
+                        })
+                    }
+                },
+
+                editDayOffset: async (days) => {
+                    try {
+                        await editDayOffset({variables: { days }})
+                        notification['success']({
+                            message: 'Changed server date.'
+                        })
+                    } catch(error) {
+                        console.log(error.message)
+
+                        notification['error']({
+                            message: 'Unable to change server date.',
                         })
                     }
                 },

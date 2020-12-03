@@ -25,7 +25,7 @@ app.use(cors())
 app.options('*', cors())
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
-app.use(logging.logURL);
+//app.use(logging.logURL);
 app.use(validate)
 
 // Serve react app
