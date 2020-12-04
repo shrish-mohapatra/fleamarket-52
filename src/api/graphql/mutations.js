@@ -9,11 +9,13 @@ const { createOrder, cancelOrder } = require('../resolvers/order.resolve')
 const { createAccount, changeBalance } = require('../resolvers/account.resolve')
 const { createStockData } = require('../resolvers/stock.resolve')
 const { editDayOffset } = require('../resolvers/admin.resolve')
+const { searchArticles } = require('../resolvers/news.resolve')
 
 const {
     GraphQLObjectType,
     GraphQLString,
-    GraphQLInt
+    GraphQLInt,
+    GraphQLList
 } = graphql;
 
 module.exports = new GraphQLObjectType({
@@ -44,6 +46,7 @@ module.exports = new GraphQLObjectType({
             }
         },
 
+
         // Account Mutations
         createAccount: {
             description: "Create portfolio account",
@@ -69,6 +72,7 @@ module.exports = new GraphQLObjectType({
                 return changeBalance(args)
             }
         },
+
 
         // Order Mutations
         createOrder: {
@@ -96,6 +100,7 @@ module.exports = new GraphQLObjectType({
             }
         },
 
+
         // Stock Data Mutations
         createStockData: {
             description: "Create stock data.",
@@ -108,6 +113,19 @@ module.exports = new GraphQLObjectType({
             },
             resolve(parent, args) {
                 return createStockData(args)
+            }
+        },
+
+        
+        // News Mutations
+        searchArticles: {
+            description: "Search for news articles based on stock name.",
+            type: new GraphQLList(types.ArticleType),
+            args: {
+                name: { type: GraphQLString },
+            },
+            resolve(parent, args) {
+                return searchArticles(args);
             }
         },
 

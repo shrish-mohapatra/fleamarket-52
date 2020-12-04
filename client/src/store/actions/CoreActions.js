@@ -45,6 +45,12 @@ export default {
                     ask
                     bid
                 }
+                articles {
+                    title
+                    url
+                    author
+                    date
+                }
             }
         }`
     ,

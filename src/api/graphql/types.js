@@ -4,8 +4,8 @@ const graphql = require('graphql');
 const User = require("../models/user.model");
 const Account = require("../models/account.model");
 const Stock = require("../models/stock.model");
-const StockData = require("../models/stockData.model");
 const Order = require("../models/order.model");
+const Article = require("../models/article.model");
 
 // Resolvers
 const stockResolver = require('../resolvers/stock.resolve')
@@ -167,6 +167,13 @@ const StockType = new GraphQLObjectType({
                 })
             }
         },
+
+        articles: {
+            type: new GraphQLList(ArticleType),
+            resolve(parent, args) {
+                return Article.find({stockID: parent.id})
+            }
+        },
     })
 })
 
@@ -220,13 +227,32 @@ const OrderType = new GraphQLObjectType({
     })
 })
 
+const ArticleType = new GraphQLObjectType({
+    name: 'Article',
+    fields: () => ({
+        title: { type: GraphQLString },
+        url: { type: GraphQLString },
+        author: { type: GraphQLString },
+        date: { type: GraphQLString },
+
+        stock: {
+            type: StockType,
+            resolve(parent, args) {
+                return Stock.findById(parent.stockID)
+            }
+        }
+    })
+})
 
 module.exports = {
     UserType,
     AuthDataType,
 
     AccountType,
+    OrderType,
+
     StockType,
     StockDataType,
-    OrderType,
+
+    ArticleType
 }

@@ -2,10 +2,12 @@ const fs = require("fs");
 const moment = require("moment");
 
 const database = require("../../config/database");
+
 const { simulateStockDataOverTime } = require("./simulate");
 const { createStock } = require("../api/resolvers/stock.resolve");
 const { signup } = require("../api/resolvers/auth.resolve");
 const { createAdmin } = require("../api/resolvers/admin.resolve");
+const { searchArticles } = require("../api/resolvers/news.resolve");
 
 const SYMBOLS_FILE = "symbols.txt";
 const WEEKS_TO_SIM = 2
@@ -76,6 +78,8 @@ const populateStocks = async (symbols) => {
             ticker: data[0],
             market: 'NASDAQ'
         });
+
+        await searchArticles({name: stock.name, stockID: stock.id});
 
         let startDate = moment().startOf('day').subtract(WEEKS_TO_SIM * 7, 'days');
 
