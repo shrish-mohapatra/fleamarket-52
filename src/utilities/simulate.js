@@ -1,12 +1,9 @@
-/*
-    @TODO
-        - incorporate expiry date
-*/
-
 const moment = require("moment");
 
 const Order = require("../api/models/order.model");
 const Account = require("../api/models/account.model");
+const Stock = require("../api/models/stock.model");
+const Transaction = require("../api/models/transaction.model");
 
 const { createStockData, getStockPrice, getStocks } = require("../api/resolvers/stock.resolve");
 const { getPortfolio } = require("../api/resolvers/account.resolve");
@@ -126,6 +123,21 @@ const processAction = async (order) => {
     order.completed = moment().add(curDayOffset, "days").format();
     order.price = marketPrice;
     order.save();
+
+    // Create transaction
+    let fPrice = (order.price/100).toFixed(2);
+    let prefix = (order.action === 'buy') ? `Bought` : `Sold`;
+    let stock = await Stock.findById(order.stockID);
+    let ticker = stock.ticker;
+
+    let transaction = new Transaction({
+        action: order.action,
+        date: order.completed,
+        info: `${prefix} ${order.quantity} share${(order.quantity > 1)? 's ' : ' '}of ${ticker} @ $${fPrice} each`,
+        accountID: order.accountID
+    });
+
+    transaction.save();
 }
 
 

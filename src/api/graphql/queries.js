@@ -49,8 +49,13 @@ module.exports = new GraphQLObjectType({
         // Test Queries
         user: {
             type: types.UserType,
-            args: {id: { type: GraphQLID },},
+            args: {
+                id: { type: GraphQLID },
+                email: { type: GraphQLString }
+            },
             resolve(parent, args) {
+                const { email } = args;
+                if(email) return User.findOne({email})
                 return User.findById(args.id)
             }
         },

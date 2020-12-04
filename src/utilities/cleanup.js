@@ -8,7 +8,8 @@ const COLLECTIONS_TO_REMOVE = [
     'stocks',
     'users',
     'admins',
-    'articles'
+    'articles',
+    'transactions'
 ]
 
 /*

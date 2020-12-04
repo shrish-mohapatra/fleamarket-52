@@ -14,7 +14,7 @@ export const CoreContext = createContext({
 })
 
 export const CoreProvider = ({children}) => {
-    const { userID, logout } = useContext(AuthContext);
+    const { userID } = useContext(AuthContext);
      
     const user = useQuery(actions.getUser, {variables: { userID }})
     const stocks = useQuery(actions.getStocks)
@@ -31,10 +31,8 @@ export const CoreProvider = ({children}) => {
                 message: 'Authentication Error',
                 description: "Your session has expired, please sign in again."
             })
-
-            logout()
         }
-    }, [stocks.error, userID, logout])
+    }, [stocks.error, userID])
 
     useEffect(() => {
         if(userID !== "") {

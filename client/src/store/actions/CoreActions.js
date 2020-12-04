@@ -12,6 +12,11 @@ export default {
                         id
                         shares
                     }
+                    transactions{
+                        action
+                        info
+                        date
+                    }
                     orders{
                         id
                         stock{

@@ -1,6 +1,11 @@
+const moment = require("moment");
+
 const Account = require("../models/account.model");
 const Order = require("../models/order.model");
 const Stock = require("../models/stock.model");
+const Transaction = require("../models/transaction.model");
+
+const { getDayOffset } = require("./admin.resolve");
 
 module.exports = {
 
@@ -29,9 +34,24 @@ module.exports = {
     */
     changeBalance: async(args) => {
         let {accountID, amount} = args;
-        let account = await Account.findById(accountID)
-        account.balance += amount
+        let dayOffset = await getDayOffset();
+
+        let account = await Account.findById(accountID);
+        if(!account) throw Error("Account does not exist.");
+
+        account.balance += amount;
         if(account.balance < 0) throw Error("Insufficient funds.");
+
+        // create transaction
+        let fAmount = (Math.abs(amount)/100).toFixed(2);
+        let transaction = new Transaction({
+            action: (amount > 0) ? 'deposit' : 'withdraw',
+            date: moment().add(dayOffset, "days").format(),
+            info: (amount > 0) ? `Deposited $${fAmount}` : `Withdrew $${fAmount}`,
+            accountID
+        });
+
+        transaction.save();
         return account.save()
     },
 
