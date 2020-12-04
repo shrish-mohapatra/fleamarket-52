@@ -15,7 +15,7 @@ function StockGraph({stock}) {
 
         const start = Math.min(rawData.length-1, 13)
 
-        for(let i=start; i>=0; i--) {
+        for(let i=start; i>=1; i--) {
             result.push({
                 name: moment(rawData[i].date).format('MMM Do'),
                 price: rawData[i].ask/100

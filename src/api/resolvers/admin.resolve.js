@@ -4,13 +4,14 @@ module.exports = {
 
     /*
         @desc    Create portfolio account with zero balance
+        @params  startDate: <string> server start date
         @return  admin MongoDB instance
     */
-    createAdmin: async() => {
+    createAdmin: async(startDate) => {
         // Only 1 admin instance can exist at a time
         await Admin.deleteMany({});
 
-        let admin = new Admin();
+        let admin = new Admin({startDate});
         return admin.save();
     },
 
@@ -24,6 +25,15 @@ module.exports = {
     getDayOffset: async() => {
         let result = await Admin.find();
         return result[0].dayOffset;
+    },
+
+    /*
+        @desc    Get server start date
+        @return  moment object formatted as string
+    */
+    getStartDate: async() => {
+        let result = await Admin.find();
+        return result[0].startDate;
     },
 
     /*

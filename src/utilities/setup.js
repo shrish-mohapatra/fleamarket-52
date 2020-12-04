@@ -10,7 +10,6 @@ const { createAdmin } = require("../api/resolvers/admin.resolve");
 const SYMBOLS_FILE = "symbols.txt";
 const WEEKS_TO_SIM = 2
 
-
 /*
     @desc    Core setup process for inital data generation
 */
@@ -22,7 +21,7 @@ const setup = async () => {
 
     await database.connectLocal();    
 
-    await createAdmin();
+    await createAdmin(moment().startOf('day').subtract(WEEKS_TO_SIM * 7, 'days').format());
     await populateUsers();
     await populateStocks(symbols);    
 
@@ -78,7 +77,7 @@ const populateStocks = async (symbols) => {
             market: 'NASDAQ'
         });
 
-        const startDate = moment().startOf('day').subtract(WEEKS_TO_SIM * 7, 'days')
+        let startDate = moment().startOf('day').subtract(WEEKS_TO_SIM * 7, 'days');
 
         await simulateStockDataOverTime(
             stock.id,          // stockID

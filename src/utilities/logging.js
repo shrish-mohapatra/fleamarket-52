@@ -1,6 +1,6 @@
 module.exports = {
     logURL: (req, res, next) => {
-        console.log(`---> (${req.method}) ${req.url}`);
+        if(!req.url.includes("graph")) console.log(`---> (${req.method}) ${req.url}`);
         next();
     }
 }

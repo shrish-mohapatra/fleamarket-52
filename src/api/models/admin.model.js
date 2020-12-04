@@ -9,6 +9,10 @@ const adminSchema = mongoose.Schema({
         type: Number,
         default: 0,
     },
+    startDate: {
+        type: String,
+        required: true
+    }
 })
 
 module.exports = mongoose.model('admin', adminSchema);

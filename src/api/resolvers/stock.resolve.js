@@ -2,9 +2,11 @@ const moment = require("moment");
 
 const Stock = require("../models/stock.model");
 const StockData = require("../models/stockData.model");
+const Account = require("../models/account.model");
+const User = require("../models/user.model");
+const Order = require("../models/order.model");
 
-const { getOrders } = require("./order.resolve");
-const { getDayOffset } = require("./admin.resolve");
+const { getDayOffset, getStartDate } = require("./admin.resolve");
 
 // Note that all numerical data has scale factor of 100
 // ex. price = 12345 => $123.45
@@ -140,21 +142,96 @@ module.exports = {
     },
 
     /*
+        @desc    Retreive stockData for specific stock (using startday and enday)
+        @param   args: {symbol, startday*, emdday*}
+        @return  array stockData MongoDB instances
+    */
+    getStockData2: async(args) => {
+        const {symbol, startday, endday} = args;
+        let serverStart = await getStartDate();
+
+        if(symbol) {
+            args.stockID = (await Stock.findOne({ticker: symbol})).id
+        }
+
+        let result = await fetchData(args);
+        if(!result) return result;
+        if(!startday && !endday) return result[0];
+
+        const startDate = moment(serverStart).add(startday || 0, "days");
+        const endDate = (endday) ? moment(serverStart).add(endday, "days") : moment();
+
+        let startIndex, endIndex;
+
+        for(let i=0; i<result.length; i++) {
+            if(moment(result[i].date) < startDate) {
+                endIndex = i;
+                break;
+            }
+
+            if(moment(result[i].date) >= endDate) startIndex = i;
+        }
+
+        return result.slice(startIndex, endIndex);
+    },
+
+    /*
         @desc    Retrieve latest stock orders
         @param   args: {symbol}
         @return  array of order MongoDB instances
     */
     getStockHistory: async(args) => {
-        if(args.symbol) {
-            args.stockID = (await Stock.findOne({ticker: args.symbol})).id
-        }
+        const {symbol, startday, endday} = args;
+        let serverStart = await getStartDate();
+        let dayOffset = await getDayOffset();
 
-        let orders = await getOrders({
+        if(symbol) args.stockID = (await Stock.findOne({ticker: symbol})).id
+
+        let orders = await Order.find({
             stockID: args.stockID,
             completed: { $ne: "" },
             failed: { $ne: true }
-        })
-        return orders
+        }).sort("-date")
+
+        let result = []
+
+        // Get username for order
+        for(let i=0; i<orders.length; i++) {
+            let account = await Account.findById(orders[i].accountID);
+            let user = await User.findById(account.userID);
+
+            result.push({
+                ...orders[i]._doc,
+                username: user.email
+            })
+        }
+
+        let endIndex;
+
+        // Get today's orders
+        if(!startday && !endday) {
+            for(let i=0; i<result.length; i++) {
+                if(moment(result[i].date) < moment().add(dayOffset, "days").startOf("day")) {
+                    endIndex = i;
+                    break;
+                }
+            }
+
+            return result.slice(0, endIndex);
+        }
+
+        const startDate = moment(serverStart).add(startday || 0, "days");
+        const endDate = (endday) ? moment(serverStart).add(endday, "days") : moment();
+
+        let newResults = [];
+
+        for(let i=0; i<result.length; i++) {
+            if(startDate < moment(result[i].date) && moment(result[i].date) < endDate) {
+                newResults.push(result[i])
+            }      
+        }
+
+        return newResults;
     },
 
 
