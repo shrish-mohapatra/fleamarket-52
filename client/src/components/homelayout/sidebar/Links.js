@@ -1,6 +1,6 @@
 import React, {useContext, useEffect, useState} from 'react';
 import { useHistory, useLocation, NavLink, } from 'react-router-dom'
-import { Menu, Button } from "antd"
+import { Menu } from "antd"
 
 import {
     DashboardOutlined,
@@ -31,7 +31,7 @@ function Links() {
                 setStockFilters(tickers)
             }
         }
-    }, [user])
+    }, [user, curSelect, setStockFilters])
 
     const navToDash = () => {
         const { pathname } = location

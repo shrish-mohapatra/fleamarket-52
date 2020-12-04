@@ -149,17 +149,20 @@ module.exports = {
     getStockData2: async(args) => {
         const {symbol, startday, endday} = args;
         let serverStart = await getStartDate();
+        let dayOffset = await getDayOffset();
 
         if(symbol) {
-            args.stockID = (await Stock.findOne({ticker: symbol})).id
+            let stock = await Stock.findOne({ticker: symbol})
+            if(!stock) throw Error("Invalid stock symbol");
+            args.stockID = stock.id;
         }
 
         let result = await fetchData(args);
-        if(!result) return result;
+
         if(!startday && !endday) return result[0];
 
         const startDate = moment(serverStart).add(startday || 0, "days");
-        const endDate = (endday) ? moment(serverStart).add(endday, "days") : moment();
+        const endDate = (endday) ? moment(serverStart).add(endday, "days") : moment().add(dayOffset, "days");
 
         let startIndex, endIndex;
 
@@ -185,14 +188,20 @@ module.exports = {
         let serverStart = await getStartDate();
         let dayOffset = await getDayOffset();
 
-        if(symbol) args.stockID = (await Stock.findOne({ticker: symbol})).id
+        let stockID;
+        if(symbol) {
+            let stock = await Stock.findOne({ticker: symbol})
+            if(!stock) throw Error("Invalid stock symbol");
+            stockID = stock.id;
+        }
 
         let orders = await Order.find({
-            stockID: args.stockID,
+            stockID,
             completed: { $ne: "" },
             failed: { $ne: true }
         }).sort("-date")
 
+        if(!orders || orders.length === 0) throw Error("Could not find stock history.");
         let result = []
 
         // Get username for order
@@ -221,7 +230,7 @@ module.exports = {
         }
 
         const startDate = moment(serverStart).add(startday || 0, "days");
-        const endDate = (endday) ? moment(serverStart).add(endday, "days") : moment();
+        const endDate = (endday) ? moment(serverStart).add(endday, "days") : moment().add(dayOffset, "days");
 
         let newResults = [];
 

@@ -14,7 +14,7 @@ function Stockbar() {
     const location = useLocation();
 
     const shouldRenderStock = (stock) => {
-        if(stockFilters[0] == -1) return true
+        if(stockFilters[0] === -1) return true
         return stockFilters.includes(stock.ticker)
     }
 

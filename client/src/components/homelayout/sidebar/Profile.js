@@ -14,7 +14,7 @@ function Profile() {
         if(dayOffset.data && !curDate) {
             setCurDate(moment().add(dayOffset.data.getDayOffset, "days"))
         }
-    }, [dayOffset])
+    }, [dayOffset, curDate])
 
     const renderInfo = () => {
         if(user.data) {

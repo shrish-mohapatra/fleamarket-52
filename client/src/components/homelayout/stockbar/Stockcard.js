@@ -47,7 +47,7 @@ function Stockcard({props: {stock, index}}) {
             let tickers;
 
             for(let i=0; i<watchlists.length; i++) {
-                if(watchlists[i].id == watchlistID) {
+                if(watchlists[i].id === watchlistID) {
                     tickers = [...watchlists[i].tickers]
                     break;
                 }
