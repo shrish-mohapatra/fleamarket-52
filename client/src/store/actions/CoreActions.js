@@ -36,6 +36,21 @@ export default {
                     name
                     tickers
                 }
+                notifications{
+                    id
+                    title
+                    message
+                    tag
+                }
+                subscriptions{
+                    id
+                    rule
+                    active
+                    stock{
+                        id
+                        ticker
+                    }
+                }
             }
         }`
     ,
@@ -137,6 +152,8 @@ export default {
         }`
     ,
 
+
+    // Watchlist
     createWatchlist: gql`
         mutation createWatchlist(
             $userID: String!,
@@ -165,6 +182,16 @@ export default {
             updateWatchlist(watchlistID: $watchlistID, tickers: $tickers) {
                 id
             }
+        }`
+    ,
+
+
+    // Notification
+    deleteNotification: gql`
+        mutation deleteNotification(
+            $notificationID: String!,
+        ) {
+            deleteNotification(notificationID: $notificationID)
         }`
     ,
 }

@@ -8,6 +8,8 @@ const Order = require("../models/order.model");
 const Article = require("../models/article.model");
 const Transaction = require("../models/transaction.model");
 const Watchlist = require("../models/watchlist.model");
+const Notification = require("../models/notification.model");
+const Subscription = require("../models/subscription.model");
 
 // Resolvers
 const stockResolver = require('../resolvers/stock.resolve')
@@ -42,7 +44,21 @@ const UserType = new GraphQLObjectType({
             resolve(parent, args) {
                 return Watchlist.find({ userID: parent.id })
             }
-        }
+        },
+
+        notifications: {
+            type: new GraphQLList(NotificationType),
+            resolve(parent, args) {
+                return Notification.find({ userID: parent.id })
+            }
+        },
+
+        subscriptions: {
+            type: new GraphQLList(SubscriptionType),
+            resolve(parent, args) {
+                return Subscription.find({ userID: parent.id })
+            }
+        },
     })
 })
 
@@ -305,10 +321,56 @@ const WatchlistType = new GraphQLObjectType({
 })
 
 
+const NotificationType = new GraphQLObjectType({
+    name: 'Notification',
+    fields: () => ({
+        id: { type: GraphQLID },
+        title: { type: GraphQLString },
+        message: { type: GraphQLString },
+        tag: { type: GraphQLString },
+
+        user: {
+            type: UserType,
+            resolve(parent, args) {
+                return User.findById(parent.userID)
+            }
+        }
+    })
+})
+
+
+const SubscriptionType = new GraphQLObjectType({
+    name: 'Subscription',
+    fields: () => ({
+        id: { type: GraphQLID },
+        rule: { type: GraphQLInt },
+        active: { type: GraphQLBoolean },
+        lastNotified: { type: GraphQLString },
+
+        user: {
+            type: UserType,
+            resolve(parent, args) {
+                return User.findById(parent.userID)
+            }
+        },
+
+        stock: {
+            type: StockType,
+            resolve(parent, args) {
+                return Stock.findById(parent.stockID)
+            }
+        }
+    })
+})
+
+
 module.exports = {
     UserType,
     AuthDataType,
     WatchlistType,
+
+    NotificationType,
+    SubscriptionType,
 
     AccountType,
     TransactionType,

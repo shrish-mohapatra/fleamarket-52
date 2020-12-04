@@ -8,6 +8,7 @@ const Transaction = require("../api/models/transaction.model");
 const { createStockData, getStockPrice, getStocks } = require("../api/resolvers/stock.resolve");
 const { getPortfolio } = require("../api/resolvers/account.resolve");
 const { getDayOffset } = require("../api/resolvers/admin.resolve");
+const { createNotification } = require("../api/resolvers/notification.resolve");
 
 const REFRESH = 10; // in seconds
 
@@ -115,7 +116,7 @@ const processAction = async (order) => {
     let marketPrice = await getStockPrice({stockID: order.stockID});
 
     if(moment(order.expiry) < moment().add(curDayOffset)) {
-        failOrder(order, marketPrice);
+        failOrder(order, marketPrice, "expiry date");
         return;
     }
     
@@ -143,6 +144,13 @@ const processAction = async (order) => {
     });
 
     transaction.save();
+
+    createNotification({
+        title: "Order Status",
+        tag: "success",
+        message: `Your ${order.action} order for ${stock.ticker} has been completed.`,
+        userID: account.userID
+    })
 }
 
 
@@ -161,7 +169,7 @@ const processBuy = async (order, account, marketPrice) => {
 
     // Check if account has enough funds for order
     if(total > account.balance) {
-        failOrder(order, marketPrice);
+        failOrder(order, marketPrice, "insufficent funds");
         return false;
     }
 
@@ -185,7 +193,7 @@ const processSell = async (order, account, marketPrice) => {
 
     // Check if there are enough shares to sell
     if(!stocks[order.stockID] || stocks[order.stockID].shares < order.quantity) {
-        failOrder(order, marketPrice);
+        failOrder(order, marketPrice, "insufficent funds");
         return false;
     }
 
@@ -205,13 +213,23 @@ const processSell = async (order, account, marketPrice) => {
 
 /*
     @desc    Fail and complete a order
-    @params  order, marketPrice
+    @params  order, marketPrice, reason
 */
-const failOrder = (order, marketPrice) => {
+const failOrder = async (order, marketPrice, reason) => {
     order.completed = moment().add(curDayOffset, "days").format();
     order.failed = true;
     order.price = marketPrice;
     order.save();
+
+    let account = await Account.findById(order.accountID);
+    let stock = await Stock.findById(order.stockID);
+
+    createNotification({
+        title: "Order Status",
+        tag: "error",
+        message: `Your ${order.action} order for ${stock.ticker} has been cancelled due to ${reason}.`,
+        userID: account.userID
+    })
 }
 
 

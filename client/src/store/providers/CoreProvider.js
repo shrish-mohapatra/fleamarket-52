@@ -33,7 +33,14 @@ export const CoreProvider = ({children}) => {
     const [deleteWatchlist] = useMutation(actions.deleteWatchlist)
     const [updateWatchlist] = useMutation(actions.updateWatchlist)
 
-    // Query polling
+    const [deleteNotification] = useMutation(actions.deleteNotification)
+
+    // Context state
+    const [stockRef, setstockRef] = useState(0);
+    const [stockFilters, setStockFilters] = useState([-1]);
+    const [watchlistID, setWatchlistID] = useState(null);
+
+    // Session expiry
     useEffect(() => {
         if(stocks.error && userID) {
             notification['error']({
@@ -43,6 +50,8 @@ export const CoreProvider = ({children}) => {
         }
     }, [stocks.error, userID])
 
+
+    // User polling
     useEffect(() => {
         if(userID !== "") {
             user.startPolling(2000)
@@ -51,6 +60,7 @@ export const CoreProvider = ({children}) => {
         }
     }, [userID, user])
 
+    // Stocks polling
     useEffect(() => {
         if(userID !== "") {
             stocks.startPolling(1000)
@@ -59,6 +69,7 @@ export const CoreProvider = ({children}) => {
         }
     }, [userID, stocks])
 
+    // Dayoffset polling
     useEffect(() => {
         if(userID !== "") {
             dayOffset.startPolling(1000)
@@ -66,10 +77,6 @@ export const CoreProvider = ({children}) => {
             dayOffset.stopPolling()
         }
     }, [userID, dayOffset])
-
-    const [stockRef, setstockRef] = useState(0);
-    const [stockFilters, setStockFilters] = useState([-1]);
-    const [watchlistID, setWatchlistID] = useState(null);
 
     return (
         <CoreContext.Provider
@@ -99,11 +106,9 @@ export const CoreProvider = ({children}) => {
                             description: `Your order for ${result.data.createOrder.stock.ticker} has been created.`
                         })
                     } catch(error) {
-                        console.log(error.message)
-
                         notification['error']({
                             message: 'Order Status',
-                            description: 'Something went wrong, order could not be created.'
+                            description: error.message
                         })
                     }
                 },
@@ -207,6 +212,17 @@ export const CoreProvider = ({children}) => {
 
                         notification['error']({
                             message: 'Unable to update watchlist.',
+                        })
+                    }
+                },
+
+                deleteNotification: async (args) => {
+                    try {
+                        await deleteNotification({variables: args})
+                    } catch(error) {
+                        console.log(error.message)
+                        notification['error']({
+                            message: 'Unable to delete notification.',
                         })
                     }
                 },

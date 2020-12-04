@@ -1,8 +1,11 @@
 const moment = require("moment");
 
 const Order = require("../models/order.model");
+const Account = require("../models/account.model");
 
 const { getDayOffset } = require("./admin.resolve");
+const { getStockPrice } = require("./stock.resolve");
+const { getPortfolio } = require("./account.resolve");
 
 module.exports = {
 
@@ -14,6 +17,28 @@ module.exports = {
     createOrder: async(args) => {
         let {accountID, stockID, action, quantity, price, expiry} = args;                      
         let dayOffset = await getDayOffset();
+                     
+        // check insufficent funds for buy order
+        if(action === "buy") {
+            let account = await Account.findById(accountID);
+            let stockPrice = await getStockPrice({stockID});
+
+            if(account.balance < (price || stockPrice) * quantity) throw Error("Insufficent funds.");
+        } else {
+            // check if user owns share
+            let portfolio = await getPortfolio({accountID});
+            let userStock;
+
+            for(let i=0; i<portfolio.length; i++) {
+                if(portfolio[i].id == stockID) {
+                    userStock = portfolio[i];
+                    break;
+                }
+            }
+
+            if(!userStock) throw Error("No shares to sell.");
+            if(userStock.shares < quantity) throw Error("Not enough shares to sell.");            
+        }
 
         let order = await new Order({
             accountID,

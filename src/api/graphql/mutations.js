@@ -11,6 +11,8 @@ const { createStockData } = require('../resolvers/stock.resolve')
 const { editDayOffset } = require('../resolvers/admin.resolve')
 const { searchArticles } = require('../resolvers/news.resolve')
 const { createWatchlist, deleteWatchlist, updateWatchlist } = require('../resolvers/watchlist.resolve')
+const { deleteNotification } = require('../resolvers/notification.resolve')
+const { createSubscription, updateSubscription, deleteSubscription } = require('../resolvers/subscription.resolve')
 
 const {
     GraphQLObjectType,
@@ -179,6 +181,56 @@ module.exports = new GraphQLObjectType({
             resolve(parent, args) {
                 editDayOffset(args);
                 return "Success";
+            }
+        },
+
+        deleteNotification: {
+            description: "Delete notification instance.",
+            type: GraphQLString,
+            args: {
+                notificationID: { type: GraphQLString },
+            },
+            resolve(parent, args) {
+                return deleteNotification(args);
+            }
+        },
+
+
+        // Subscription mutations
+        createSubscription: {
+            description: "Create event subscription.",
+            type: types.SubscriptionType,
+            args: {
+                userID: { type: GraphQLString },
+                stockID: { type: GraphQLString },
+                rule: { type: GraphQLString },
+            },
+            resolve(parent, args) {
+                return createSubscription(args)
+            }
+        },
+
+        deleteSubscription: {
+            description: "Delete event subscription.",
+            type: GraphQLString,
+            args: {
+                subscriptionID: { type: GraphQLString },
+            },
+            resolve(parent, args) {
+                return deleteSubscription(args)
+            }
+        },
+
+        updateSubscription: {
+            description: "Update event subscription",
+            type: types.SubscriptionType,
+            args: {
+                subscriptionID: { type: GraphQLString },
+                active: { type: GraphQLString },
+                rule: { type: GraphQLString },
+            },
+            resolve(parent, args) {
+                return updateSubscription(args)
             }
         },
     }

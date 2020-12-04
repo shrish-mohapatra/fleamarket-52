@@ -2,7 +2,7 @@ const mongoose = require('mongoose');
 
 /*
     @desc    Watchlist MongoDB model for users to keep track of certain stocks
-    @param   fields: {stockID, title, url, author, date}
+    @param   fields: {userID, name, tickers}
 */
 const watchlistSchema = mongoose.Schema({    
     name: {

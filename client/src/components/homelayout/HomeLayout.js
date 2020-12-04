@@ -4,6 +4,7 @@ import { Layout } from 'antd'
 import Sidebar from './sidebar/Sidebar';
 import Stockbar from './stockbar/Stockbar';
 import ViewRouter from '../../routers/ViewRouter'
+import NotificationStack from './NotificationStack';
 
 import { AuthContext } from '../../store/providers/AuthProvider';
 import { Redirect } from 'react-router-dom';
@@ -23,6 +24,8 @@ function HomeLayout() {
             <Layout className="view-layout">
                 <ViewRouter/>
             </Layout>
+
+            <NotificationStack/>
         </Layout>
     )
 

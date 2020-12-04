@@ -10,7 +10,9 @@ const COLLECTIONS_TO_REMOVE = [
     'admins',
     'articles',
     'transactions',
-    'watchlists'
+    'watchlists',
+    'notifications',
+    'subscriptions'
 ]
 
 /*
