@@ -10,6 +10,7 @@ const { createAccount, changeBalance } = require('../resolvers/account.resolve')
 const { createStockData } = require('../resolvers/stock.resolve')
 const { editDayOffset } = require('../resolvers/admin.resolve')
 const { searchArticles } = require('../resolvers/news.resolve')
+const { createWatchlist, deleteWatchlist, updateWatchlist } = require('../resolvers/watchlist.resolve')
 
 const {
     GraphQLObjectType,
@@ -97,6 +98,43 @@ module.exports = new GraphQLObjectType({
             args: { orderID: { type: GraphQLString } },
             resolve(parent, args) {
                 return cancelOrder(args)
+            }
+        },
+
+
+        // Watchlist Mutations
+        createWatchlist: {
+            description: "Create stock watchlist.",
+            type: types.WatchlistType,
+            args: {
+                userID: { type: GraphQLString },
+                name: { type: GraphQLString },
+            },
+            resolve(parent, args) {
+                return createWatchlist(args)
+            }
+        },
+
+        deleteWatchlist: {
+            description: "Delete stock watchlist.",
+            type: GraphQLString,
+            args: {
+                watchlistID: { type: GraphQLString },
+            },
+            resolve(parent, args) {
+                return deleteWatchlist(args)
+            }
+        },
+
+        updateWatchlist: {
+            description: "Update stock watchlist tickers.",
+            type: types.WatchlistType,
+            args: {
+                watchlistID: { type: GraphQLString },
+                tickers: { type: new GraphQLList(GraphQLString) },
+            },
+            resolve(parent, args) {
+                return updateWatchlist(args)
             }
         },
 

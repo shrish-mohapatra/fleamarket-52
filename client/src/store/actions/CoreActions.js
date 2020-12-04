@@ -11,6 +11,7 @@ export default {
                     portfolio{
                         id
                         shares
+                        ticker
                     }
                     transactions{
                         action
@@ -28,6 +29,11 @@ export default {
                         completed
                         failed
                     }
+                }
+                watchlists{
+                    id
+                    name
+                    tickers
                 }
             }
         }`
@@ -127,6 +133,36 @@ export default {
             $days: Int!,
         ) {
             editDayOffset(days: $days)
+        }`
+    ,
+
+    createWatchlist: gql`
+        mutation createWatchlist(
+            $userID: String!,
+            $name: String!
+        ) {
+            createWatchlist(userID: $userID,name: $name) {
+                id
+            }
+        }`
+    ,
+
+    deleteWatchlist: gql`
+        mutation deleteWatchlist(
+            $watchlistID: String!,
+        ) {
+            deleteWatchlist(watchlistID: $watchlistID)
+        }`
+    ,
+
+    updateWatchlist: gql`
+        mutation updateWatchlist(
+            $watchlistID: String!,
+            $tickers: [String],
+        ) {
+            updateWatchlist(watchlistID: $watchlistID, tickers: $tickers) {
+                id
+            }
         }`
     ,
 }

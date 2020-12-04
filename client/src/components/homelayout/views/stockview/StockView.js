@@ -7,6 +7,7 @@ import StockGraph from './StockGraph';
 import StockStats from './StockStats';
 import StockOrder from './StockOrder';
 import StockNews from './StockNews';
+import StockWatchlist from './StockWatchlist';
 
 function StockView() {
     const {stockRef, stocks} = useContext(CoreContext)
@@ -29,6 +30,10 @@ function StockView() {
                     <Col xs={24} lg={6}>
                         <Card className="stockview-card" title="Order">
                             <StockOrder stock={data[stockRef]}/>
+                        </Card>
+
+                        <Card className="stockview-card" title="Watchlist">
+                            <StockWatchlist stock={data[stockRef]}/>
                         </Card>
 
                         <Card className="stockview-card" title="News">

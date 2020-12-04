@@ -7,6 +7,7 @@ const Stock = require("../models/stock.model");
 const Order = require("../models/order.model");
 const Article = require("../models/article.model");
 const Transaction = require("../models/transaction.model");
+const Watchlist = require("../models/watchlist.model");
 
 // Resolvers
 const stockResolver = require('../resolvers/stock.resolve')
@@ -33,6 +34,13 @@ const UserType = new GraphQLObjectType({
             type: new GraphQLList(AccountType),
             resolve(parent, args) {
                 return Account.find({ userID: parent.id })
+            }
+        },
+
+        watchlists: {
+            type: new GraphQLList(WatchlistType),
+            resolve(parent, args) {
+                return Watchlist.find({ userID: parent.id })
             }
         }
     })
@@ -239,6 +247,7 @@ const OrderType = new GraphQLObjectType({
 const ArticleType = new GraphQLObjectType({
     name: 'Article',
     fields: () => ({
+        id: { type: GraphQLID },
         title: { type: GraphQLString },
         url: { type: GraphQLString },
         author: { type: GraphQLString },
@@ -257,6 +266,7 @@ const ArticleType = new GraphQLObjectType({
 const TransactionType = new GraphQLObjectType({
     name: 'Transaction',
     fields: () => ({
+        id: { type: GraphQLID },
         action: { type: GraphQLString },
         info: { type: GraphQLString },
         date: { type: GraphQLString },
@@ -264,7 +274,24 @@ const TransactionType = new GraphQLObjectType({
         account: {
             type: AccountType,
             resolve(parent, args) {
-                return Stock.findById(parent.accountID)
+                return Account.findById(parent.accountID)
+            }
+        }
+    })
+})
+
+
+const WatchlistType = new GraphQLObjectType({
+    name: 'Watchlist',
+    fields: () => ({
+        id: { type: GraphQLID },
+        name: { type: GraphQLString },
+        tickers: { type: new GraphQLList(GraphQLString) },
+
+        user: {
+            type: UserType,
+            resolve(parent, args) {
+                return User.findById(parent.userID)
             }
         }
     })
@@ -274,6 +301,7 @@ const TransactionType = new GraphQLObjectType({
 module.exports = {
     UserType,
     AuthDataType,
+    WatchlistType,
 
     AccountType,
     TransactionType,

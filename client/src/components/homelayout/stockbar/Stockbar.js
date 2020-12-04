@@ -10,18 +10,12 @@ import Ordercard from "./Ordercard";
 const { Sider } = Layout;
 
 function Stockbar() {
-    const { stocks, user, showPortfolio } = useContext(CoreContext);
+    const { stocks, user, stockFilters } = useContext(CoreContext);
     const location = useLocation();
 
-    const inPortfolio = (stock) => {
-        if(!showPortfolio) return true
-        const {portfolio} = user.data.user.accounts[0]
-
-        for(let i=0; i<portfolio.length; i++) {
-            if(portfolio[i].id === stock.id) return true
-        }
-
-        return false
+    const shouldRenderStock = (stock) => {       
+        if(stockFilters[0] == -1) return true
+        return stockFilters.includes(stock.ticker)
     }
 
     const renderStocks = () => {
@@ -29,7 +23,7 @@ function Stockbar() {
             return (
                 <>
                     { stocks.data.stocks.map((stock, index) => {
-                        if(inPortfolio(stock)) {
+                        if(shouldRenderStock(stock)) {
                             return(<Stockcard key={`stockcard-${index}`} props={{stock, index}}/>)
                         }
                         return <div key={index}/>

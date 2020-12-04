@@ -7,7 +7,7 @@ import {notification} from 'antd'
 
 export const CoreContext = createContext({
     user: null,
-    showPortfolio: true,
+    stockFilters: [-1],
     stockRef: 0,
     stocks: [],
     stockData: [],
@@ -16,15 +16,23 @@ export const CoreContext = createContext({
 export const CoreProvider = ({children}) => {
     const { userID } = useContext(AuthContext);
      
+    // Queries
     const user = useQuery(actions.getUser, {variables: { userID }})
     const stocks = useQuery(actions.getStocks)
     const dayOffset = useQuery(actions.getDayOffset)
 
+    // Mutations
     const [createOrder] = useMutation(actions.createOrder)
     const [cancelOrder] = useMutation(actions.cancelOrder)
+
     const [changeBalance] = useMutation(actions.changeBalance)
     const [editDayOffset] = useMutation(actions.editDayOffset)
 
+    const [createWatchlist] = useMutation(actions.createWatchlist)
+    const [deleteWatchlist] = useMutation(actions.deleteWatchlist)
+    const [updateWatchlist] = useMutation(actions.updateWatchlist)
+
+    // Query polling
     useEffect(() => {
         if(stocks.error && userID) {
             notification['error']({
@@ -59,7 +67,7 @@ export const CoreProvider = ({children}) => {
     }, [userID, dayOffset])
 
     const [stockRef, setstockRef] = useState(0);
-    const [showPortfolio, setShowPortfolio] = useState(true);
+    const [stockFilters, setStockFilters] = useState([-1]);
 
     return (
         <CoreContext.Provider
@@ -68,11 +76,15 @@ export const CoreProvider = ({children}) => {
                 dayOffset,
                 stockRef,
                 stocks,
-                showPortfolio,
+
+                stockFilters,
+                setStockFilters,
+
 
                 selectStock: (index) => {
                     setstockRef(index);
                 },
+
 
                 createOrder: async (args) => {                   
                     try {
@@ -110,6 +122,7 @@ export const CoreProvider = ({children}) => {
                     }
                 },
 
+
                 changeBalance: async (amount) => {
                     const args = {
                         accountID: user?.data.user.accounts[0].id,
@@ -132,6 +145,7 @@ export const CoreProvider = ({children}) => {
                     }
                 },
 
+
                 editDayOffset: async (days) => {
                     try {
                         await editDayOffset({variables: { days }})
@@ -147,7 +161,51 @@ export const CoreProvider = ({children}) => {
                     }
                 },
 
-                setShowPortfolio,
+
+                createWatchlist: async (args) => {
+                    try {
+                        await createWatchlist({variables: args})
+                        notification['success']({
+                            message: 'Created watchlist.'
+                        })
+                    } catch(error) {
+                        console.log(error.message)
+
+                        notification['error']({
+                            message: 'Unable to create watchlist.',
+                        })
+                    }
+                },
+
+                deleteWatchlist: async (args) => {
+                    try {
+                        await deleteWatchlist({variables: args})
+                        notification['success']({
+                            message: 'Deleted watchlist.'
+                        })
+                    } catch(error) {
+                        console.log(error.message)
+
+                        notification['error']({
+                            message: 'Unable to delete watchlist.',
+                        })
+                    }
+                },
+
+                updateWatchlist: async (args) => {
+                    try {
+                        await updateWatchlist({variables: args})
+                        notification['success']({
+                            message: 'Updated watchlist.'
+                        })
+                    } catch(error) {
+                        console.log(error.message)
+
+                        notification['error']({
+                            message: 'Unable to update watchlist.',
+                        })
+                    }
+                },
             }}
         >
             {children}
