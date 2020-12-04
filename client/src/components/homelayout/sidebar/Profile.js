@@ -1,7 +1,7 @@
 import React, { useContext, useEffect, useRef, useState } from 'react';
 import moment from 'moment';
 
-import { Avatar, Skeleton, DatePicker } from 'antd';
+import { Avatar, Skeleton, DatePicker, Tooltip } from 'antd';
 import { UserOutlined } from '@ant-design/icons';
 import { CoreContext } from '../../../store/providers/CoreProvider';
 
@@ -16,13 +16,28 @@ function Profile() {
         }
     }, [dayOffset, curDate])
 
+    const fPrice = (value) => {
+        return (value/100).toFixed(2);
+    }
+
+    const renderTooltip = (data) => (
+        <>
+            <span>Cash: ${fPrice(data.accounts[0].balance)}</span>
+            <br/>
+            <span>Market Value: ${fPrice(data.accounts[0].value)}</span>
+        </>
+    )
+
     const renderInfo = () => {
         if(user.data) {
             let data = user.data.user
             return (
                 <div className="profile-info">
                     <p className="info-name">{data.email}</p>
-                    <p className="info-balance">${(data.accounts[0].balance/100).toFixed(2)}</p>
+                    
+                    <Tooltip title={renderTooltip(data)} placement="right">
+                        <p className="info-balance">${(data.accounts[0].value/100).toFixed(2)}</p>
+                    </Tooltip>
                 </div>
             )
         }

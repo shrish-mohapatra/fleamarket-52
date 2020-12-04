@@ -6,6 +6,7 @@ const Stock = require("../models/stock.model");
 const Transaction = require("../models/transaction.model");
 
 const { getDayOffset } = require("./admin.resolve");
+const { getStockPrice } = require("./stock.resolve");
 
 module.exports = {
 
@@ -62,53 +63,75 @@ module.exports = {
         @return  array of stocks with shares field (# shares owned)
     */
     getPortfolio: async(args) => {
-        let resultsMap = {}
+        return fetchPortfolioData(args);
+    },
 
-        // Fetch completed, non-failed buy orders
-        let buyOrders = await Order.find({
-            accountID: args.accountID,
-            action: "buy",
-            completed: {$ne: ""},
-            failed: null
-        })
 
-        // Add stocks and purchased # of shares to resultsMap
-        for(let i=0; i<buyOrders.length; i++) {
-            let order = buyOrders[i];            
+    /*
+        @desc    Retrieve value of current portfolio
+        @param   args: {accountID}
+        @return  price with factor 100
+    */    
+    getPortfolioValue: async(args) => {
+        let portfolio = await fetchPortfolioData(args);
+        let account = await Account.findById(args.accountID);
+        let value = account.balance;
 
-            if(resultsMap[order.stockID]) {
-                resultsMap[order.stockID].shares += order.quantity;
-            } else {
-                let stock = await Stock.findById(order.stockID);
-                resultsMap[order.stockID] = {
-                    ...stock._doc,
-                    id: stock._doc._id,
-                    shares: order.quantity
-                };
-            }
+        for(let i=0; i<portfolio.length; i++) {
+            let price = await getStockPrice({stockID: portfolio[i].id});
+            value += price * portfolio[i].shares;
         }
+        
+        return value;
+    }
+}
 
-        // Fetch completed, non-failed sell orders
-        let sellOrders = await Order.find({
-            accountID: args.accountID,
-            action: "sell",
-            completed: {$ne: ""},
-            failed: null
-        })
+const fetchPortfolioData = async (args) => {
+    let resultsMap = {}
 
-        // Subtract sold quantities from # of shares
-        for(let i=0; i<sellOrders.length; i++) {
-            let order = sellOrders[i];
+    // Fetch completed, non-failed buy orders
+    let buyOrders = await Order.find({
+        accountID: args.accountID,
+        action: "buy",
+        completed: {$ne: ""},
+        failed: null
+    })
 
-            resultsMap[order.stockID].shares -= order.quantity;
+    // Add stocks and purchased # of shares to resultsMap
+    for(let i=0; i<buyOrders.length; i++) {
+        let order = buyOrders[i];            
 
-            if(resultsMap[order.stockID].shares == 0) {
-                delete resultsMap[order.stockID];
-            }
+        if(resultsMap[order.stockID]) {
+            resultsMap[order.stockID].shares += order.quantity;
+        } else {
+            let stock = await Stock.findById(order.stockID);
+            resultsMap[order.stockID] = {
+                ...stock._doc,
+                id: stock._doc._id,
+                shares: order.quantity
+            };
         }
-
-        if(args.returnMap) return resultsMap
-        return Object.values(resultsMap);
     }
 
+    // Fetch completed, non-failed sell orders
+    let sellOrders = await Order.find({
+        accountID: args.accountID,
+        action: "sell",
+        completed: {$ne: ""},
+        failed: null
+    })
+
+    // Subtract sold quantities from # of shares
+    for(let i=0; i<sellOrders.length; i++) {
+        let order = sellOrders[i];
+
+        resultsMap[order.stockID].shares -= order.quantity;
+
+        if(resultsMap[order.stockID].shares == 0) {
+            delete resultsMap[order.stockID];
+        }
+    }
+
+    if(args.returnMap) return resultsMap
+    return Object.values(resultsMap);
 }

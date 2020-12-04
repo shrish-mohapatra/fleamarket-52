@@ -31,7 +31,7 @@ function Ordercard({props: {order, index}}) {
             trigger={['contextMenu']}
             overlay={renderMenu()}
         >
-            <div className="stockcard" onClick={() => console.log(index)}>            
+            <div className="stockcard">            
                 <p className=""><b>{order.stock.ticker}</b> x {order.quantity}</p>
                 <p>{order.action === 'buy'? "Buy" : "Sell"} @ ${order.price/100}</p>
                 {renderStatus()}

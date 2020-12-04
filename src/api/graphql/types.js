@@ -90,6 +90,13 @@ const AccountType = new GraphQLObjectType({
             resolve(parent, args) {
                 return accountResolver.getPortfolio({ accountID: parent.id })
             }
+        },
+
+        value: {
+            type: GraphQLInt,
+            resolve(parent, args) {
+                return accountResolver.getPortfolioValue({ accountID: parent.id })
+            }
         }
     })
 })

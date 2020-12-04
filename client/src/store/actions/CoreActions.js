@@ -8,6 +8,7 @@ export default {
                 accounts{
                     id
                     balance
+                    value
                     portfolio{
                         id
                         shares
