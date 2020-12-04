@@ -139,9 +139,10 @@ export default {
     createWatchlist: gql`
         mutation createWatchlist(
             $userID: String!,
-            $name: String!
+            $name: String!,
+            $tickers: [String],
         ) {
-            createWatchlist(userID: $userID,name: $name) {
+            createWatchlist(userID: $userID, name: $name, tickers: $tickers) {
                 id
             }
         }`

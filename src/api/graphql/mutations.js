@@ -109,6 +109,7 @@ module.exports = new GraphQLObjectType({
             args: {
                 userID: { type: GraphQLString },
                 name: { type: GraphQLString },
+                tickers: { type: new GraphQLList(GraphQLString)}
             },
             resolve(parent, args) {
                 return createWatchlist(args)

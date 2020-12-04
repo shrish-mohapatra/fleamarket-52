@@ -13,7 +13,7 @@ function Stockbar() {
     const { stocks, user, stockFilters } = useContext(CoreContext);
     const location = useLocation();
 
-    const shouldRenderStock = (stock) => {       
+    const shouldRenderStock = (stock) => {
         if(stockFilters[0] == -1) return true
         return stockFilters.includes(stock.ticker)
     }

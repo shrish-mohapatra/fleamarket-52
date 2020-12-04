@@ -8,6 +8,7 @@ import {notification} from 'antd'
 export const CoreContext = createContext({
     user: null,
     stockFilters: [-1],
+    watchlistID: null,
     stockRef: 0,
     stocks: [],
     stockData: [],
@@ -68,6 +69,7 @@ export const CoreProvider = ({children}) => {
 
     const [stockRef, setstockRef] = useState(0);
     const [stockFilters, setStockFilters] = useState([-1]);
+    const [watchlistID, setWatchlistID] = useState(null);
 
     return (
         <CoreContext.Provider
@@ -80,6 +82,8 @@ export const CoreProvider = ({children}) => {
                 stockFilters,
                 setStockFilters,
 
+                watchlistID,
+                setWatchlistID,
 
                 selectStock: (index) => {
                     setstockRef(index);

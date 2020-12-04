@@ -1,12 +1,12 @@
 import React, {useContext, useEffect, useState} from 'react';
-import { useHistory, useLocation, NavLink } from 'react-router-dom'
-import { Menu } from "antd"
+import { useHistory, useLocation, NavLink, } from 'react-router-dom'
+import { Menu, Button } from "antd"
 
 import {
     DashboardOutlined,
     WalletOutlined,
     AreaChartOutlined,
-    LogoutOutlined
+    LogoutOutlined,
 } from '@ant-design/icons';
 
 import { AuthContext } from '../../../store/providers/AuthProvider';
@@ -19,14 +19,15 @@ function Links() {
     const [curSelect, setCurSelect] = useState('dash-all');
 
     const { logout } = useContext(AuthContext); 
-    const { setStockFilters, user } = useContext(CoreContext);
+    const { setStockFilters, setWatchlistID, deleteWatchlist, user } = useContext(CoreContext);
 
     useEffect(() => {
         if(user.data) {
             if(curSelect === 'dash-portfolio') filterByPortfolio();
             if(curSelect.includes('watchlist')) {
                 let index = curSelect.split('-')[1]
-                let tickers = user.data.user.watchlists[index]
+                if(!user.data.user.watchlists[index]) return;
+                let tickers = user.data.user.watchlists[index].tickers
                 setStockFilters(tickers)
             }
         }
@@ -38,7 +39,14 @@ function Links() {
         history.push('/home/stock')
     }
 
+    const removeWatchlist = (watchlistID) => { 
+        deleteWatchlist({watchlistID})
+    }
+
+    // Stock filters
     const filterByPortfolio = () => {
+        setWatchlistID(null);
+
         if(user.data) {
             const {portfolio} = user.data.user.accounts[0]
             let filters = []
@@ -51,9 +59,18 @@ function Links() {
         }
     }
 
+    const filterByWatchlist = (watchlist) => {
+        setStockFilters(watchlist.tickers);
+        setWatchlistID(watchlist.id);
+    }
+
+    // Render methods
     const renderSubmenu = () => (
         <Menu.SubMenu key='dashboard' title='Dashboard' icon={<DashboardOutlined/>} onClick={navToDash}>
-            <Menu.Item key='dash-all' onClick={() => setStockFilters([-1])}>
+            <Menu.Item key='dash-all' onClick={() => {
+                setStockFilters([-1])
+                setWatchlistID(null)
+            }}>
                 All Stocks
             </Menu.Item>
             <Menu.Item key='dash-portfolio' onClick={filterByPortfolio}>
@@ -66,10 +83,11 @@ function Links() {
         if(user.data) return (
             <Menu.SubMenu key='watchlist' title='Watchlists' icon={<WalletOutlined/>} onClick={navToDash}>
                 {user.data.user.watchlists.map((watchlist, index) => (
-                    <Menu.Item key={`watchlist-${index}`} onClick={() => setStockFilters(watchlist.tickers)}>
+                    <Menu.Item className="watchlist-menu" key={`watchlist-${index}`} onClick={() => filterByWatchlist(watchlist)}>
                         { watchlist.name }
+                        <p className="watchlist-delete" onClick={() => removeWatchlist(watchlist.id)}>Delete</p>
                     </Menu.Item>
-                ))}                
+                ))}     
             </Menu.SubMenu>
         )
     }
@@ -80,7 +98,8 @@ function Links() {
             mode="inline"
             defaultSelectedKeys={['dash-all']}
             defaultOpenKeys={['dashboard']}
-            onSelect={(value) => setCurSelect(value.key)}
+            value={curSelect}
+            onSelect={(value) => setCurSelect(value.key)}            
         >
             {renderSubmenu()}
             {renderWatchlists()}

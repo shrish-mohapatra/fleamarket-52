@@ -4,12 +4,12 @@ module.exports = {
 
     /*
         @desc    Create watchlist for user
-        @param   args: {userID, name}
+        @param   args: {userID, name, tickers*}
         @return  mongoDB watchlist instance
     */
     createWatchlist: async(args) => {
-        const {name, userID} = args;
-        let watchlist = new Watchlist({name, userID});
+        const {name, userID, tickers} = args;
+        let watchlist = new Watchlist({name, userID, tickers: tickers || []});
         return watchlist.save();
     },
 
