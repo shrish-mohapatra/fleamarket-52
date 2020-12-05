@@ -36,7 +36,7 @@ function StockView() {
                             <StockWatchlist stock={data[stockRef]}/>
                         </Card>
 
-                        <Card className="stockview-card" title="News">
+                        <Card className="stockview-card" title="Related News">
                             <StockNews stock={data[stockRef]}/>
                         </Card>
                     </Col>

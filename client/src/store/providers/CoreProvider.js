@@ -15,7 +15,7 @@ export const CoreContext = createContext({
 })
 
 export const CoreProvider = ({children}) => {
-    const { userID } = useContext(AuthContext);
+    const { userID, logout } = useContext(AuthContext);
      
     // Queries
     const user = useQuery(actions.getUser, {variables: { userID }})
@@ -51,6 +51,7 @@ export const CoreProvider = ({children}) => {
                 message: 'Authentication Error',
                 description: "Your session has expired, please sign in again."
             })
+            logout()
         }
     }, [stocks.error, userID])
 
@@ -111,9 +112,11 @@ export const CoreProvider = ({children}) => {
                             description: `Your order for ${result.data.createOrder.stock.ticker} has been created.`
                         })
                     } catch(error) {
+                        console.log(error.message)
+
                         notification['error']({
                             message: 'Order Status',
-                            description: error.message
+                            description: `Your order has been cancelled due to ${error.message}.`
                         })
                     }
                 },
@@ -124,7 +127,7 @@ export const CoreProvider = ({children}) => {
 
                         notification['info']({
                             message: 'Order Status',
-                            description: `Your order for has been cancelled.`
+                            description: `Your order has been cancelled.`
                         })
                     } catch(error) {
                         console.log(error.message)

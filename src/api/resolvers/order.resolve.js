@@ -17,13 +17,18 @@ module.exports = {
     createOrder: async(args) => {
         let {accountID, stockID, action, quantity, price, expiry} = args;                      
         let dayOffset = await getDayOffset();
+
+        // check for invalid expiry
+        if(expiry) {
+            if(moment(expiry).startOf("day") < moment().add(dayOffset, "days").startOf("day")) throw Error("invalid expiry date");
+        }
                      
         // check insufficent funds for buy order
         if(action === "buy") {
             let account = await Account.findById(accountID);
             let stockPrice = await getStockPrice({stockID});
 
-            if(account.balance < (price || stockPrice) * quantity) throw Error("Insufficent funds.");
+            if(account.balance < (price || stockPrice) * quantity) throw Error("insufficent funds");
         } else {
             // check if user owns share
             let portfolio = await getPortfolio({accountID});
@@ -36,8 +41,8 @@ module.exports = {
                 }
             }
 
-            if(!userStock) throw Error("No shares to sell.");
-            if(userStock.shares < quantity) throw Error("Not enough shares to sell.");            
+            if(!userStock) throw Error("lack of shares to sell");
+            if(userStock.shares < quantity) throw Error("lack of shares to sell");            
         }
 
         let order = await new Order({

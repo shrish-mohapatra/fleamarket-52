@@ -12,13 +12,11 @@ function StockNews({stock}) {
                     <p>{article.title.slice(0, Math.min(article.title.length, 85))}</p>
 
                     <div className="news-meta">
-                        <p>{article.author}</p>
+                        <p>{article.author} • <a href={article.url} target="_blank">Learn more</a></p>
                         <p>{moment(article.date).format("MMM Do YYYY")}</p>
                     </div>
                 </div>
             ))}
-
-            <Button style={{width: '100%'}}>Search Again</Button>
         </div>
     );
 }

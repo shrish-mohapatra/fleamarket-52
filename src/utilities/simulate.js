@@ -161,7 +161,7 @@ const processAction = async (order) => {
     let account = await Account.findById(order.accountID);
     let marketPrice = await getStockPrice({stockID: order.stockID});
 
-    if(moment(order.expiry) < moment().add(curDayOffset)) {
+    if(moment(order.expiry) < moment().add(curDayOffset, "days")) {
         failOrder(order, marketPrice, "expiry date");
         return;
     }
