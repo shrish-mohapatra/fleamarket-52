@@ -18,7 +18,8 @@ const {
     GraphQLObjectType,
     GraphQLString,
     GraphQLInt,
-    GraphQLList
+    GraphQLList,
+    GraphQLBoolean
 } = graphql;
 
 module.exports = new GraphQLObjectType({
@@ -203,7 +204,7 @@ module.exports = new GraphQLObjectType({
             args: {
                 userID: { type: GraphQLString },
                 stockID: { type: GraphQLString },
-                rule: { type: GraphQLString },
+                rule: { type: GraphQLInt },
             },
             resolve(parent, args) {
                 return createSubscription(args)
@@ -226,8 +227,8 @@ module.exports = new GraphQLObjectType({
             type: types.SubscriptionType,
             args: {
                 subscriptionID: { type: GraphQLString },
-                active: { type: GraphQLString },
-                rule: { type: GraphQLString },
+                active: { type: GraphQLBoolean },
+                rule: { type: GraphQLInt },
             },
             resolve(parent, args) {
                 return updateSubscription(args)

@@ -4,23 +4,27 @@ import { Menu } from "antd"
 
 import {
     DashboardOutlined,
-    WalletOutlined,
+    StockOutlined,
     AreaChartOutlined,
     LogoutOutlined,
+    BellOutlined
 } from '@ant-design/icons';
 
 import { AuthContext } from '../../../store/providers/AuthProvider';
 import { CoreContext } from '../../../store/providers/CoreProvider';
+import Subscriptions from './Subscriptions';
 
 function Links() {
     const history = useHistory();
     const location = useLocation();
     
     const [curSelect, setCurSelect] = useState('dash-all');
+    const [showDrawer, setDrawer] = useState(false);
 
     const { logout } = useContext(AuthContext); 
     const { setStockFilters, setWatchlistID, deleteWatchlist, user } = useContext(CoreContext);
 
+    // Update stock filters
     useEffect(() => {
         if(user.data) {
             if(curSelect === 'dash-portfolio') filterByPortfolio();
@@ -81,7 +85,7 @@ function Links() {
 
     const renderWatchlists = () => {
         if(user.data) return (
-            <Menu.SubMenu key='watchlist' title='Watchlists' icon={<WalletOutlined/>} onClick={navToDash}>
+            <Menu.SubMenu key='watchlist' title='Watchlists' icon={<StockOutlined/>} onClick={navToDash}>
                 {user.data.user.watchlists.map((watchlist, index) => (
                     <Menu.Item className="watchlist-menu" key={`watchlist-${index}`} onClick={() => filterByWatchlist(watchlist)}>
                         { watchlist.name }
@@ -93,27 +97,35 @@ function Links() {
     }
 
     return (
-        <Menu
-            className="sidebar-menu"
-            mode="inline"
-            defaultSelectedKeys={['dash-all']}
-            defaultOpenKeys={['dashboard']}
-            value={curSelect}
-            onSelect={(value) => setCurSelect(value.key)}            
-        >
-            {renderSubmenu()}
-            {renderWatchlists()}
+        <>
+            <Menu
+                className="sidebar-menu"
+                mode="inline"
+                defaultSelectedKeys={['dash-all']}
+                defaultOpenKeys={['dashboard']}
+                value={curSelect}
+                onSelect={(value) => setCurSelect(value.key)}            
+            >
+                {renderSubmenu()}
+                {renderWatchlists()}
 
-            <Menu.Item key='orders' icon={<AreaChartOutlined/>}>
-                Orders
-                <NavLink to='/home/order'/>
-            </Menu.Item>
+                <Menu.Item key='orders' icon={<AreaChartOutlined/>}>
+                    Orders
+                    <NavLink to='/home/order'/>
+                </Menu.Item>
 
-            <Menu.Item key='logout' icon={<LogoutOutlined/>}>
-                Logout
-                <NavLink to='/auth' onClick={logout}/>
-            </Menu.Item>
-        </Menu>
+                <Menu.Item key='subscriptions' icon={<BellOutlined/>} onClick={() => setDrawer(true)}>
+                    Subscriptions
+                </Menu.Item>
+
+                <Menu.Item key='logout' icon={<LogoutOutlined/>}>
+                    Logout
+                    <NavLink to='/auth' onClick={logout}/>
+                </Menu.Item>
+            </Menu>
+
+            <Subscriptions visible={showDrawer} onClose={() => setDrawer(false)}/>
+        </>
     );
 }
 

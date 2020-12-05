@@ -4,11 +4,14 @@ const Order = require("../api/models/order.model");
 const Account = require("../api/models/account.model");
 const Stock = require("../api/models/stock.model");
 const Transaction = require("../api/models/transaction.model");
+const User = require("../api/models/user.model");
+const Subscription = require("../api/models/subscription.model");
 
-const { createStockData, getStockPrice, getStocks } = require("../api/resolvers/stock.resolve");
+const { createStockData, getStockPrice, getStockChange, getStocks } = require("../api/resolvers/stock.resolve");
 const { getPortfolio } = require("../api/resolvers/account.resolve");
 const { getDayOffset } = require("../api/resolvers/admin.resolve");
 const { createNotification } = require("../api/resolvers/notification.resolve");
+const { updateSubscription } = require("../api/resolvers/subscription.resolve");
 
 const REFRESH = 10; // in seconds
 
@@ -73,19 +76,63 @@ const simulateMarket = async () => {
     const iterations = (dayOffset-curDayOffset) + 1;
     let factor = (iterations > 1)? 0.1 : RANDOM_FACTOR;
 
-    // need to test this though
-
     for(let i=0; i<iterations; i++) {
         for(let j=0; j<stocks.length; j++) {
             await simulateStockData(stocks[j].id, factor)
         }
-    
+
+        await processSubscriptions()
         await simulateOrders()
 
         if(dayOffset != curDayOffset) {
             curDayOffset += 1;
         }
     }    
+}
+
+/*
+    @desc    Process all event subscriptions
+*/
+const processSubscriptions = async () => {
+    let users = await User.find({});
+
+    for(let i=0; i<users.length; i++) {
+        let subscriptions = await Subscription.find({userID: users[i].id})
+
+        for(let j=0; j<subscriptions.length; j++) {
+            let sub = subscriptions[j];
+            
+            // check active
+            if(!sub.active) continue;
+            
+            // check last notified
+            if(sub.lastNotified) {
+                let lastNotifiedDay = moment(sub.lastNotified).startOf("day")
+                let today = moment().add(curDayOffset, "days").startOf("day")
+                if(today.diff(lastNotifiedDay) == 0) continue;
+            }
+
+            // check rule
+            let change = await getStockChange({stockID: sub.stockID})
+            let rule = sub.rule * 100;
+            
+            if(Math.abs(change) > rule) {
+                let stock = await Stock.findById(sub.stockID);
+                
+                createNotification({
+                    title: "Event Subscription",
+                    tag: "info",
+                    message: `${stock.ticker} has had notable price change of ${(change/100).toFixed(2)}%.`,
+                    userID: users[i].id
+                })
+
+                await updateSubscription({
+                    subscriptionID: sub.id,
+                    lastNotified: moment().add(curDayOffset, "days").format()
+                })
+            }
+        }
+    }
 }
 
 
@@ -96,7 +143,6 @@ const simulateOrders = async () => {
     let orders = await Order.find({completed: ""});
 
     for(let i=0; i<orders.length; i++) {
-        console.log("Processing order #" + i)
         await processAction(orders[i]);
     }
 }
@@ -122,8 +168,6 @@ const processAction = async (order) => {
     
     let result = await actions[order.action](order, account, marketPrice);
     if(!result) return;
-
-    console.log("Succesful order")
 
     // Complete order
     order.completed = moment().add(curDayOffset, "days").format();

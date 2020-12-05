@@ -1,19 +1,21 @@
 import React, { useContext, useEffect, useState } from 'react';
 import { CoreContext } from '../../../../store/providers/CoreProvider';
 import { AuthContext } from '../../../../store/providers/AuthProvider';
-import { Row, Col, Select, Button, Typography, Popconfirm, Input } from 'antd';
+import { Select, Button, Typography, Popconfirm, Input, InputNumber, Divider } from 'antd';
 
 const { Option } = Select;
 const { Text } = Typography;
 
 function StockWatchlist({stock}) {
-    const { user, updateWatchlist, createWatchlist } = useContext(CoreContext);
+    const { user, updateWatchlist, createWatchlist, createSubscription } = useContext(CoreContext);
     const { userID } = useContext(AuthContext);
 
     const [options, setOptions] = useState([])
     const [selected, setSelected] = useState("create");
     const [watchlistName, setWatchlistName] = useState("");
+    const [rule, setRule] = useState(0);
 
+    // Update watchlists dropdown
     useEffect(() => {
         if(user.data) {
             let options = [...user.data.user.watchlists]
@@ -48,7 +50,18 @@ function StockWatchlist({stock}) {
             tickers
         })
     }
+    
+    const createSub = () => {
+        createSubscription({
+            rule,
+            userID,
+            stockID: stock.id
+        })
+        setRule(0);
+    }
 
+
+    // render methods
     const renderPopconfirm = () => (
         <>
             <p className="new-watchlist-title">Create new watchlist</p>
@@ -56,17 +69,51 @@ function StockWatchlist({stock}) {
         </>
     )
 
+    const renderSubscription = () => {
+        if(!user.data) return
+        let subs = user.data.user.subscriptions;
+
+        let found;
+        for(let i=0; i<subs.length; i++) {
+            if(subs[i].stock.id == stock.id) {
+                found = true;
+                break;
+            }
+        }
+
+        if(found) return;
+        
+        return(
+            <>
+                <Divider/>
+
+                <p>Subscribe for updates.</p>
+                <div className="watchlist-control-div">
+                    <InputNumber 
+                        className="watchlist-control-select" 
+                        min={0}
+                        formatter={value => `${value}%`}
+                        parser={value => value.replace('%', '')}
+                        value={rule}
+                        onChange={(value) => setRule(value)}
+                    />
+                    <Button type="primary" onClick={createSub}>Confirm</Button>
+                </div>
+                <p className="watchlist-control-help">Set a price rule ex. 5%</p>
+            </>
+        )
+    }
+
     return (
-        <Row gutter={16}>
-            <Col span={18}>
-                <Select style={{width: '100%'}} value={selected} onChange={value => setSelected(value)}>
+        <>
+            <p>Add stock to watchlist.</p>
+            <div className="watchlist-control-div">
+                <Select className="watchlist-control-select" value={selected} onChange={value => setSelected(value)}>
                     <Option value="create"><Text type="secondary">New Watchlist</Text></Option>
                     {options.map((option, index) => (
                         <Option key={`watchlist-option-${index}`} value={index}>{option.name}</Option>
                     ))}
                 </Select>
-            </Col>
-            <Col span={6}>
                 <Popconfirm
                     title={renderPopconfirm()}
                     onConfirm={onConfirm}
@@ -77,8 +124,10 @@ function StockWatchlist({stock}) {
                 >
                     <Button type="primary" onClick={addToWatchlist}>Add</Button>
                 </Popconfirm>
-            </Col>
-        </Row>
+            </div>           
+
+            { renderSubscription() }
+        </>
     );
 }
 

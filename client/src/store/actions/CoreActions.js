@@ -194,4 +194,38 @@ export default {
             deleteNotification(notificationID: $notificationID)
         }`
     ,
+
+
+    // Subscription
+    createSubscription: gql`
+        mutation createSubscription(
+            $userID: String!,
+            $stockID: String!,
+            $rule: Int!,
+        ) {
+            createSubscription(userID: $userID, stockID: $stockID, rule: $rule) {
+                id
+            }
+        }`
+    ,
+
+    deleteSubscription: gql`
+        mutation deleteSubscription(
+            $subscriptionID: String!,
+        ) {
+            deleteSubscription(subscriptionID: $subscriptionID)
+        }`
+    ,
+
+    updateSubscription: gql`
+        mutation updateSubscription(
+            $subscriptionID: String!,
+            $rule: Int,
+            $active: Boolean,
+        ) {
+            updateSubscription(subscriptionID: $subscriptionID, rule: $rule, active: $active) {
+                id
+            }
+        }`
+    ,
 }

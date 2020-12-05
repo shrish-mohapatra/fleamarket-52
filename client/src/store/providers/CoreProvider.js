@@ -33,6 +33,10 @@ export const CoreProvider = ({children}) => {
     const [deleteWatchlist] = useMutation(actions.deleteWatchlist)
     const [updateWatchlist] = useMutation(actions.updateWatchlist)
 
+    const [createSubscription] = useMutation(actions.createSubscription)
+    const [deleteSubscription] = useMutation(actions.deleteSubscription)
+    const [updateSubscription] = useMutation(actions.updateSubscription)
+
     const [deleteNotification] = useMutation(actions.deleteNotification)
 
     // Context state
@@ -97,6 +101,7 @@ export const CoreProvider = ({children}) => {
                 },
 
 
+                // order
                 createOrder: async (args) => {                   
                     try {
                         const result = await createOrder({variables: args})
@@ -154,7 +159,6 @@ export const CoreProvider = ({children}) => {
                     }
                 },
 
-
                 editDayOffset: async (days) => {
                     try {
                         await editDayOffset({variables: { days }})
@@ -170,7 +174,7 @@ export const CoreProvider = ({children}) => {
                     }
                 },
 
-
+                // watchlist
                 createWatchlist: async (args) => {
                     try {
                         await createWatchlist({variables: args})
@@ -212,6 +216,51 @@ export const CoreProvider = ({children}) => {
 
                         notification['error']({
                             message: 'Unable to update watchlist.',
+                        })
+                    }
+                },
+
+
+                // subscription
+                createSubscription: async (args) => {
+                    try {
+                        await createSubscription({variables: args})
+                        notification['success']({
+                            message: 'Created subscription.'
+                        })
+                    } catch(error) {
+                        notification['error']({
+                            message: error.message,
+                        })
+                    }
+                },
+
+                deleteSubscription: async (args, ticker) => {
+                    try {
+                        await deleteSubscription({variables: args})
+                        notification['success']({
+                            message: `Deleted ${ticker} event subscription.`
+                        })
+                    } catch(error) {
+                        console.log(error.message)
+
+                        notification['error']({
+                            message: `Unable to delete ${ticker} event subscription.`,
+                        })
+                    }
+                },
+
+                updateSubscription: async (args, ticker) => {
+                    try {
+                        await updateSubscription({variables: args})
+                        notification['success']({
+                            message: `Updated ${ticker} event subscription.`
+                        })
+                    } catch(error) {
+                        console.log(error.message)
+
+                        notification['error']({
+                            message: `Unable to update ${ticker} event subscription.`,
                         })
                     }
                 },

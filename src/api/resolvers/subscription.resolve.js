@@ -9,6 +9,9 @@ module.exports = {
     */
     createSubscription: async(args) => {
         const {rule, userID, stockID} = args;
+
+        if(rule <= 0) throw Error("Invalid rule.");
+
         let subscription = new Subscription({
             rule,
             userID,
@@ -20,15 +23,16 @@ module.exports = {
 
     /*
         @desc    Update subscription activie state or rule
-        @param   args: {subscriptionID, active*, role*}
+        @param   args: {subscriptionID, active*, role*, lastNotified*}
         @return  mongoDB subscription instance
     */
     updateSubscription: async(args) => {
-        const {subscriptionID, active, rule} = args;
+        const {subscriptionID, active, rule, lastNotified} = args;
         let subscription = await Subscription.findById(subscriptionID);
         
         if(active != null) subscription.active = active;
         if(rule != null) subscription.rule = rule;
+        if(lastNotified != null) subscription.lastNotified = lastNotified;
 
         return subscription.save()
     },
