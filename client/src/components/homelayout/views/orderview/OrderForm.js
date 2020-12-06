@@ -22,7 +22,7 @@ function OrderForm() {
             quantity,
         }
 
-        if(formData.priceType === 'limit') order.price = price * 100
+        if(formData.priceType === 'limit') order.price = Math.floor(price * 100)
         if(formData.goodTill) order.expiry = formData.goodTill.format()
 
         createOrder(order)

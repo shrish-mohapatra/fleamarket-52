@@ -22,6 +22,11 @@ function Stockbar() {
         return stockFilters.includes(stock.ticker)
     }
 
+    const shouldRenderOrder = (order) => {
+        if(search == "") return true
+        return order.stock.ticker.toLowerCase().includes(search.toLowerCase())
+    }
+
     const renderStocks = () => {
         if(stocks.data && user.data) {
             return (
@@ -42,9 +47,11 @@ function Stockbar() {
             const orders = [...user.data.user.accounts[0].orders].reverse()
             return (
                 <>
-                    { orders.map((order, index) => (
-                        <Ordercard key={`ordercard-${index}`} props={{order, index}}/>
-                    ))}
+                    { orders.map((order, index) => {
+                        if(shouldRenderOrder(order)) {
+                            return <Ordercard key={`ordercard-${index}`} props={{order, index}}/>   
+                        }                        
+                    })}
                 </>
             )
         }
@@ -65,7 +72,7 @@ function Stockbar() {
             <div className="stockbar-search-div">
                 <Search
                     className="stockbar-search"
-                    placeholder="Search stocks"
+                    placeholder={`Search ${location.pathname === "/home/order" ? "orders" : "stocks"}`}
                     allowClear
                     value={search}
                     onChange={e => setSearch(e.target.value)}

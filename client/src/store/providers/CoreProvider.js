@@ -51,7 +51,7 @@ export const CoreProvider = ({children}) => {
                 message: 'Authentication Error',
                 description: "Your session has expired, please sign in again."
             })
-            //logout()
+            logout()
         }
     }, [stocks.error, userID])
 
@@ -105,6 +105,7 @@ export const CoreProvider = ({children}) => {
                 // order
                 createOrder: async (args) => {                   
                     try {
+                        console.log(args)
                         const result = await createOrder({variables: args})
 
                         notification['info']({
@@ -113,10 +114,15 @@ export const CoreProvider = ({children}) => {
                         })
                     } catch(error) {
                         console.log(error.message)
+                        let description = `Your order has been cancelled due to ${error.message}.`
+
+                        if(error.message.toLowerCase().includes("500")) {
+                            description = "Something went wrong, order could not be created."
+                        }
 
                         notification['error']({
                             message: 'Order Status',
-                            description: `Your order has been cancelled due to ${error.message}.`
+                            description
                         })
                     }
                 },
@@ -166,13 +172,13 @@ export const CoreProvider = ({children}) => {
                     try {
                         await editDayOffset({variables: { days }})
                         notification['success']({
-                            message: 'Changed server date.'
+                            message: 'Submitted server date change request.'
                         })
                     } catch(error) {
                         console.log(error.message)
 
                         notification['error']({
-                            message: 'Unable to change server date.',
+                            message: 'Unable to submit server date change request.',
                         })
                     }
                 },

@@ -33,7 +33,7 @@ function Ordercard({props: {order, index}}) {
         >
             <div className="stockcard">            
                 <p className=""><b>{order.stock.ticker}</b> x {order.quantity}</p>
-                <p>{order.action === 'buy'? "Buy" : "Sell"} @ ${order.price/100}</p>
+                <p>{order.action === 'buy'? "Buy" : "Sell"} @ {order.price ? '$' + order.price/100 : "market"}</p>
                 {renderStatus()}
             </div>
         </Dropdown>

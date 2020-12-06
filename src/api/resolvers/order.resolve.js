@@ -18,6 +18,8 @@ module.exports = {
         let {accountID, stockID, action, quantity, price, expiry} = args;                      
         let dayOffset = await getDayOffset();
 
+        console.log("creating order")
+
         // check for invalid expiry
         if(expiry) {
             if(moment(expiry).startOf("day") < moment().add(dayOffset, "days").startOf("day")) throw Error("invalid expiry date");
