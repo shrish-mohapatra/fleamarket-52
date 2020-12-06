@@ -18,7 +18,7 @@ const stockRouter = require("./src/api/routes/stock.routes");
 const orderRouter = require("./src/api/routes/order.routes");
 
 const app = express();
-const port = 8000;
+const port = process.argv[2] || 8000;
 
 // Configure Middleware
 app.use(cors())

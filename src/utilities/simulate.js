@@ -87,7 +87,19 @@ const simulateMarket = async () => {
         if(dayOffset != curDayOffset) {
             curDayOffset += 1;
         }
-    }    
+    }
+    
+    if(iterations > 1) {
+        let users = await User.find({});
+        for(let i=0; i<users.length; i++) {
+            createNotification({
+                title: "Updated Server Date",
+                tag: "success",
+                message: `The server has processed ${iterations-1} days of market activity. The date is now ${moment().add(curDayOffset, "days").format("MMM Do YYYY")}.`,
+                userID: users[i].id
+            })
+        }
+    }
 }
 
 /*

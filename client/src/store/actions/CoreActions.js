@@ -13,6 +13,7 @@ export default {
                         id
                         shares
                         ticker
+                        avgPrice
                     }
                     transactions{
                         action
@@ -67,6 +68,7 @@ export default {
                 low
                 ask
                 bid
+                volume
                 data {
                     date
                     ask

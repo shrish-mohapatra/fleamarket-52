@@ -103,12 +103,16 @@ const fetchPortfolioData = async (args) => {
 
         if(resultsMap[order.stockID]) {
             resultsMap[order.stockID].shares += order.quantity;
+            resultsMap[order.stockID].totalQuantity += order.quantity;
+            resultsMap[order.stockID].avgPrice += order.price * order.quantity;
         } else {
             let stock = await Stock.findById(order.stockID);
             resultsMap[order.stockID] = {
                 ...stock._doc,
                 id: stock._doc._id,
-                shares: order.quantity
+                shares: order.quantity,
+                avgPrice: order.price * order.quantity,
+                totalQuantity: order.quantity
             };
         }
     }
@@ -126,10 +130,17 @@ const fetchPortfolioData = async (args) => {
         let order = sellOrders[i];
 
         resultsMap[order.stockID].shares -= order.quantity;
+        resultsMap[order.stockID].totalQuantity += order.quantity;
+        resultsMap[order.stockID].avgPrice += order.quantity * order.price;
 
         if(resultsMap[order.stockID].shares == 0) {
             delete resultsMap[order.stockID];
         }
+    }
+
+    for(let [key, value] of Object.entries(resultsMap)) {
+        resultsMap[key].avgPrice *= 1/resultsMap[key].totalQuantity;
+        delete resultsMap[key].totalQuantity;
     }
 
     if(args.returnMap) return resultsMap

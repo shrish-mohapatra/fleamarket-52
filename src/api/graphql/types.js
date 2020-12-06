@@ -126,6 +126,7 @@ const StockType = new GraphQLObjectType({
         ticker: { type: GraphQLString },
         market: { type: GraphQLString },    
         shares: { type: GraphQLInt },
+        avgPrice: { type: GraphQLInt },
 
         data: {
             type: new GraphQLList(StockDataType),

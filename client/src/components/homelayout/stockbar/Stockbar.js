@@ -1,19 +1,23 @@
-import React, { useContext } from 'react';
+import React, { useContext, useState } from 'react';
 import { CoreContext } from '../../../store/providers/CoreProvider';
 
-import { Layout, Skeleton } from 'antd';
+import { Layout, Skeleton, Input } from 'antd';
 import { useLocation } from 'react-router-dom';
 
 import Stockcard from './Stockcard';
 import Ordercard from "./Ordercard";
 
 const { Sider } = Layout;
+const { Search } = Input;
 
 function Stockbar() {
     const { stocks, user, stockFilters } = useContext(CoreContext);
+    const [search, setSearch] = useState("");
     const location = useLocation();
 
     const shouldRenderStock = (stock) => {
+        if(search != "" && !stock.ticker.toLowerCase().includes(search.toLowerCase())) return false;
+
         if(stockFilters[0] === -1) return true
         return stockFilters.includes(stock.ticker)
     }
@@ -57,12 +61,24 @@ function Stockbar() {
             className="stockbar"
             theme="light"
             trigger={null}
-        >
+        >  
+            <div className="stockbar-search-div">
+                <Search
+                    className="stockbar-search"
+                    placeholder="Search stocks"
+                    allowClear
+                    value={search}
+                    onChange={e => setSearch(e.target.value)}
+                />    
+            </div>
+
             <div className="stockbar-menu">
                 <Skeleton loading={stocks.loading} active>
                     {renderCards()}
                 </Skeleton>
             </div>
+
+            
         </Sider>
     );
 }

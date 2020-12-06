@@ -28,7 +28,7 @@ function StockHeader({stock}) {
         const {portfolio} = user.data.user.accounts[0]
 
         for(let i=0; i<portfolio.length; i++) {
-            if(portfolio[i].id === stock.id) return `You own ${portfolio[i].shares} shares of ${stock.ticker}`
+            if(portfolio[i].id === stock.id) return `You own ${portfolio[i].shares} shares of ${stock.ticker} purchased at $${(portfolio[i].avgPrice/100).toFixed(2)}`
         }
 
         return `You do not own any shares of ${stock.ticker}`

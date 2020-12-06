@@ -51,7 +51,7 @@ export const CoreProvider = ({children}) => {
                 message: 'Authentication Error',
                 description: "Your session has expired, please sign in again."
             })
-            logout()
+            //logout()
         }
     }, [stocks.error, userID])
 
