@@ -83,4 +83,4 @@
     ```
 3. Visit (http://localhost:8000) to view application.
 
-For more information regarding the application feel free to read the [project report]().
+For more information regarding the application feel free to read the [project report](https://github.com/shrish-mohapatra/fleamarket-52/blob/master/COMP%202406%20Project%20Report%20-%20Shrish%20Mohapatra.pdf).
